@@ -1,0 +1,8 @@
+--bbb
+Content-Disposition: form-data; name="singleFile"; filename="Unknown File Type.bin"
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: unknown
+Content-Length: 16
+
+YmluYXJ5IHRleHQ=
+--bbb--
