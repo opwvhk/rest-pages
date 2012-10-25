@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>net.sf.opk</groupId>
+		<artifactId>opk-parent</artifactId>
+		<version>4-SNAPSHOT</version>
+	</parent>
+	<!--
+	TODO: add to version control
+	TODO: test and fix reports
+	TODO: create site with usage example, example converter, etc.
+	-->
+
+	<groupId>net.sf.opk</groupId>
+	<artifactId>rest-pages</artifactId>
+	<version>1.0</version>
+	<packaging>jar</packaging>
+	<name>REST Pages</name>
+	<description><![CDATA[
+		Library that provides request forwarding and HTML form parsing to JAX-RS webservices. This allows these
+		webservices to expose some resources as a web application, using easy form handling and separation of business
+		and display logic.
+        ]]></description>
+	<inceptionYear>2012</inceptionYear>
+	<scm>
+		<connection>scm:svn:svn://svn.code.sf.net/p/opk/code/rest-pages/trunk/</connection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/opk/code/rest-pages/trunk/</developerConnection>
+		<url>http://svn.code.sf.net/p/opk/code/rest-pages/trunk/</url>
+	</scm>
+	<properties>
+		<jdk.version>1.7</jdk.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<!-- Needed for test cases; MUST be before the JavaEE6 API -->
+		<dependency>
+			<groupId>org.glassfish.extras</groupId>
+			<artifactId>glassfish-embedded-web</artifactId>
+			<version>3.1.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- JavaEE API -->
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-web-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>org.jboss.spec</groupId>
+			<artifactId>jboss-javaee-6.0</artifactId>
+			<version>3.0.1.Final</version>
+			<type>pom</type>
+			<scope>provided</scope>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>org.jvnet</groupId>
+			<artifactId>mimepull</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml</groupId>
+			<artifactId>classmate</artifactId>
+			<version>0.5.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>1.9.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>1.4.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>1.4.11</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.mockito</groupId>
+					<artifactId>mockito-all</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.6.0.201210061924</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.0</version>
+				<executions>
+					<execution>
+						<id>attach-descriptor</id>
+						<goals>
+							<goal>attach-descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

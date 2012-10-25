@@ -1,0 +1,30 @@
+--bbb
+Content-Disposition: form-data; name="field1"
+
+abc
+--bbb
+Content-Disposition: form-data; name="currency1"
+
+$
+--bbb
+Content-Disposition: form-data; name="currency2"
+
+€
+--bbb
+Content-Disposition: form-data; name="currency3"
+Content-Type: text/plain; charset=utf-8
+
+€
+--bbb
+Content-Disposition: form-data; name="singleFile"; filename="Unknown File Type.bin"
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Length: 16
+
+YmluYXJ5IHRleHQ=
+.................................................
+--bbb
+Content-Disposition: form-data; name="field1"
+
+def
+--bbb--
