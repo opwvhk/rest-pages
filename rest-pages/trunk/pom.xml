@@ -10,8 +10,8 @@
 		<version>4-SNAPSHOT</version>
 	</parent>
 	<!--
-	TODO: add to version control
-	TODO: test and fix reports
+	TODO: add license header to all files (the license already applies as per the parent POM, but this is for completeness)
+	TODO: verify reports
 	TODO: create site with usage example, example converter, etc.
 	-->
 
