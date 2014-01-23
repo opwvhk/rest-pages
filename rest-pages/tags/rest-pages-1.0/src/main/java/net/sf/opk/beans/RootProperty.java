@@ -17,7 +17,7 @@ package net.sf.opk.beans;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import static net.sf.opk.util.GenericsUtil.resolveType;
+import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 
 
 /**

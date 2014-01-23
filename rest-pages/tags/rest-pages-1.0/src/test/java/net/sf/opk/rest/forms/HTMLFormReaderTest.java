@@ -41,7 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.opk.beans.PropertyParser;
-import net.sf.opk.rest.forms.conversion.ConversionService;
+import net.sf.opk.beans.conversion.ConversionService;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED_TYPE;

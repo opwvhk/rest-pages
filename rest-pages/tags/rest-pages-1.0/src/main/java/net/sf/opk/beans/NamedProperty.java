@@ -23,10 +23,10 @@ import java.util.List;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.util.BeanUtil;
+import net.sf.opk.beans.util.BeanUtil;
 
-import static net.sf.opk.util.GenericsUtil.resolveReturnType;
-import static net.sf.opk.util.GenericsUtil.resolveType;
+import static net.sf.opk.beans.util.GenericsUtil.resolveReturnType;
+import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 
 
 /**

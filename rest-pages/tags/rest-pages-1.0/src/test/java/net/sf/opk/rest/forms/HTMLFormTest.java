@@ -30,10 +30,10 @@ import org.junit.Test;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
-import net.sf.opk.rest.forms.conversion.ConversionService;
+import net.sf.opk.beans.conversion.ConversionService;
 
 import static java.util.Arrays.asList;
-import static net.sf.opk.util.GenericsUtil.resolveType;
+import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

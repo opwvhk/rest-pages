@@ -20,9 +20,9 @@ import java.util.Map;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.rest.forms.conversion.ConversionService;
+import net.sf.opk.beans.conversion.ConversionService;
 
-import static net.sf.opk.util.GenericsUtil.findTypeParameter;
+import static net.sf.opk.beans.util.GenericsUtil.findTypeParameter;
 
 
 /**
