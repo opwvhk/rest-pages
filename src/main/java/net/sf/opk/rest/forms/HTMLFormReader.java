@@ -47,7 +47,7 @@ import org.jvnet.mimepull.MIMEMessage;
 import org.jvnet.mimepull.MIMEPart;
 
 import net.sf.opk.beans.PropertyParser;
-import net.sf.opk.rest.forms.conversion.ConversionService;
+import net.sf.opk.beans.conversion.ConversionService;
 
 import static java.lang.String.format;
 import static javax.mail.internet.MimeUtility.decodeText;

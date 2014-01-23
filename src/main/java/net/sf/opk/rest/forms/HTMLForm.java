@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
-import net.sf.opk.rest.forms.conversion.ConversionService;
+import net.sf.opk.beans.conversion.ConversionService;
 
 import javax.validation.ConstraintViolation;
 
