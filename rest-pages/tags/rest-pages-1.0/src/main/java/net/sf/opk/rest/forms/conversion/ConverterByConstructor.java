@@ -19,9 +19,9 @@ import java.lang.reflect.Constructor;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.rest.util.BeanUtil;
-import net.sf.opk.rest.util.Cache;
 import net.sf.opk.rest.util.Prioritized;
+import net.sf.opk.util.BeanUtil;
+import net.sf.opk.util.Cache;
 
 import static java.lang.String.format;
 
@@ -71,8 +71,8 @@ public class ConverterByConstructor extends SingleValueConverter implements Prio
 	@Override
 	public <T> T convertTo(ResolvedType resolvedTypez, String value)
 	{
-        Class<T> clazz = (Class<T>) resolvedTypez.getErasedType();
-        Constructor<T> constructor = getConstructor(clazz);
+		Class<T> clazz = (Class<T>)resolvedTypez.getErasedType();
+		Constructor<T> constructor = getConstructor(clazz);
 		if (constructor == null)
 		{
 			throw new ConversionException(format(

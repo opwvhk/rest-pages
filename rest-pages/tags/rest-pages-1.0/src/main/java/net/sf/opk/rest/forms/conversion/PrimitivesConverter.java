@@ -25,7 +25,7 @@ import com.fasterxml.classmate.ResolvedType;
 
 import net.sf.opk.rest.util.Prioritized;
 
-import static net.sf.opk.rest.util.GenericsUtil.resolveType;
+import static net.sf.opk.util.GenericsUtil.resolveType;
 
 
 /**

@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.rest.util;
+package net.sf.opk.util;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
@@ -46,12 +46,12 @@ public class BeanUtilTest extends UtilityClassTestBase
 	@Test
 	public void testFindProperties()
 	{
-		Map<String,PropertyDescriptor> properties = BeanUtil.findProperties(DummyBean.class);
+		Map<String, PropertyDescriptor> properties = BeanUtil.findProperties(DummyBean.class);
 		assertEquals(2, properties.size());
 		assertEquals(String.class, properties.get("name").getPropertyType());
 		assertEquals(Integer.TYPE, properties.get("age").getPropertyType());
 
-		Map<String,PropertyDescriptor> properties2 = BeanUtil.findProperties(DummyBean.class);
+		Map<String, PropertyDescriptor> properties2 = BeanUtil.findProperties(DummyBean.class);
 		assertSame(properties, properties2);
 	}
 

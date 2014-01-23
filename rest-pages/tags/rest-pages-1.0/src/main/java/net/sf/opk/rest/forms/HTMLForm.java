@@ -17,14 +17,18 @@ package net.sf.opk.rest.forms;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
 import net.sf.opk.rest.forms.conversion.ConversionService;
+
+import javax.validation.ConstraintViolation;
 
 import static java.util.Arrays.asList;
 
@@ -195,19 +199,24 @@ public class HTMLForm
 
 
 	/**
-	 * Apply a subset of the scalar form data to the specified bean. The prefix is used as the property the bean
-	 * represents. All form fields with that prefix are interpreted
+	 * <p>Apply a subset of the scalar form data to the specified bean. The prefix is used as the property the bean
+	 * represents. All form fields with that prefix will be applied.</p>
+     *
+     * <p>Each form field value is converted, applied and validated. </p>
 	 *
 	 * @param prefix the field name prefix
 	 * @param bean   the Java Bean to apply the scalar form data to
+     * @return a (hopefully empty) set of constraint violations
 	 */
-	public void applyValuesTo(String prefix, Object bean)
+	public Set<ConstraintViolation<?>> applyValuesTo(String prefix, Object bean)
 	{
 		if (prefix != null)
 		{
 			prefix += '.';
 		}
 		int prefixLength = prefix == null ? 0 : prefix.length();
+
+		// TODO (OPWvH-K, 2014-01-22): Implement validation, converting ConversionExceptions to ConstraintViolations
 
 		for (Map.Entry<String, List<String>> formParameter : formData.entrySet())
 		{
@@ -219,7 +228,8 @@ public class HTMLForm
 				property.setValue(bean, value);
 			}
 		}
-	}
+        return Collections.emptySet();
+    }
 
 
 	@Override

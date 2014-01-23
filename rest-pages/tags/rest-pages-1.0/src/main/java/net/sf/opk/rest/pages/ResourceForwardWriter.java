@@ -76,7 +76,7 @@ public class ResourceForwardWriter implements MessageBodyWriter<ResourceForward>
 	 * @see <a href="http://jersey.576304.n2.nabble.com/Thread-access-to-Context-objects-tp3880758p3880915.html">Jersey
 	 *      mailing list: Thread-access-to-Context-objects</a>
 	 * @see <a href="http://tech.lefedt.de/2010/11/an-mvc-extension-for-jersey-selecting-views-based-on-executed-controller-and-action">
-	 *     Blog entry demonstrating an MVC extension for Jersey</a>
+	 *      Blog entry demonstrating an MVC extension for Jersey</a>
 	 */
 	@Override
 	public void writeTo(ResourceForward resourceForward, Class<?> type, Type genericType, Annotation[] annotation,
