@@ -17,6 +17,7 @@ package net.sf.opk.rest.forms;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -219,6 +220,40 @@ public class HTMLForm
 				property.setValue(bean, value);
 			}
 		}
+	}
+
+
+	/**
+	 * Get all values of a form field.
+	 *
+	 * @param name the name of the form field
+	 * @return all values of the form field, or an empty list if the field does not exist
+	 */
+	public List<String> getValues(String name)
+	{
+		List<String> values = formData.get(name);
+		if (values == null)
+		{
+			values = Collections.emptyList();
+		}
+		else
+		{
+			values = Collections.unmodifiableList(values);
+		}
+		return values;
+	}
+
+
+	/**
+	 * Get the first value of a form field.
+	 *
+	 * @param name the name of the form field
+	 * @return the first field value, or {@code null} if the field does not exist
+	 */
+	public String getFirstValue(String name)
+	{
+		List<String> values = getValues(name);
+		return values.isEmpty() ? null : values.get(0);
 	}
 
 
