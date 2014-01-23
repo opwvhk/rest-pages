@@ -18,6 +18,7 @@ package net.sf.opk.rest.forms;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,10 +34,12 @@ import net.sf.opk.beans.PropertyParser;
 import net.sf.opk.rest.forms.conversion.ConversionService;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static net.sf.opk.rest.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -111,6 +114,9 @@ public class HTMLFormTest
 		assertEquals(field1, entry.getKey());
 		assertEquals("value4", entry.getValue());
 
+		assertEquals("value1", htmlForm.getFirstValue(field1));
+		assertEquals(asList("value1", "value2", "value3", "value4"), htmlForm.getValues(field1));
+
 		String field2 = "parent.field2";
 
 		assertTrue(values.hasNext());
@@ -119,6 +125,9 @@ public class HTMLFormTest
 		assertEquals("true", entry.getValue());
 
 		assertFalse(values.hasNext());
+
+		assertNull(htmlForm.getFirstValue("nonexistent"));
+		assertEquals(Collections.<String>emptyList(), htmlForm.getValues("nonexistent"));
 	}
 
 
@@ -193,7 +202,7 @@ public class HTMLFormTest
 		when(propertyParser.parse("parent.field2")).thenReturn(property2);
 
 		Object value2 = new Object();
-		when(conversionService.convert(asList("true"), typeBoolean)).thenReturn(value2);
+		when(conversionService.convert(singletonList("true"), typeBoolean)).thenReturn(value2);
 
 		htmlForm.applyValuesTo(bean);
 
@@ -215,7 +224,7 @@ public class HTMLFormTest
 		when(propertyParser.parse("field2")).thenReturn(property2);
 
 		Object value2 = new Object();
-		when(conversionService.convert(asList("true"), typeBoolean)).thenReturn(value2);
+		when(conversionService.convert(singletonList("true"), typeBoolean)).thenReturn(value2);
 
 		htmlForm.applyValuesTo("parent", bean);
 
