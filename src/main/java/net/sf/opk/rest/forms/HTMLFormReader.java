@@ -83,8 +83,7 @@ public class HTMLFormReader implements MessageBodyReader<HTMLForm>
 
 
 	/**
-	 * No-arg constructor to create proxies with. <strong>This constructor leaves the object in an invalid
-	 * state!</strong>
+	 * No-arg constructor to create proxies with. <strong>This constructor leaves the object in an invalid state!</strong>
 	 */
 	protected HTMLFormReader()
 	{

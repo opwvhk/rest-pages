@@ -13,11 +13,12 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.rest.util;
+package net.sf.opk.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -163,7 +164,7 @@ public class GenericsUtilTest extends UtilityClassTestBase
 		@Override
 		public Set<Entry<String, V>> entrySet()
 		{
-			return null;
+			return Collections.emptySet();
 		}
 	}
 

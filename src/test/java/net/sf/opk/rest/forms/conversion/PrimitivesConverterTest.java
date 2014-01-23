@@ -21,8 +21,8 @@ import com.fasterxml.classmate.ResolvedType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
-import static net.sf.opk.rest.util.GenericsUtil.resolveType;
+import static java.util.Collections.singletonList;
+import static net.sf.opk.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -67,7 +67,7 @@ public class PrimitivesConverterTest
 
 	public void testForPrimitive(ResolvedType primitiveType, ResolvedType wrapperType, String input, Object converted)
 	{
-		List<String> values = asList(input);
+		List<String> values = singletonList(input);
 		when(mockConverter.convertTo(wrapperType, values)).thenReturn(converted);
 
 		assertTrue(converter.canConvertTo(primitiveType));

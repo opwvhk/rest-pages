@@ -33,7 +33,7 @@ import net.sf.opk.beans.PropertyParser;
 import net.sf.opk.rest.forms.conversion.ConversionService;
 
 import static java.util.Arrays.asList;
-import static net.sf.opk.rest.util.GenericsUtil.resolveType;
+import static net.sf.opk.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -86,7 +86,7 @@ public class HTMLFormTest
 	@Test
 	public void testFieldValues() throws IOException
 	{
-		Iterator<Map.Entry<String,String>> values = htmlForm.values().iterator();
+		Iterator<Map.Entry<String, String>> values = htmlForm.values().iterator();
 		Map.Entry<String, String> entry;
 
 		String field1 = "field1";

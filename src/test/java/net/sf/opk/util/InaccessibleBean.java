@@ -13,69 +13,13 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.rest.util;
+package net.sf.opk.util;
 
 /**
- * Dummy bean to test {@link BeanUtil} with.
+ * Bean to test {@link InstantiationException}s with.
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-class DummyBean
+public abstract class InaccessibleBean
 {
-	DummyBean()
-	{
-		// Nothing to do.
-	}
-
-
-	private DummyBean(int age)
-	{
-		this.age = age;
-	}
-
-
-	DummyBean(String name)
-	{
-		this.name = name.toString();
-	}
-
-
-	private String name;
-	private int age;
-
-
-	public String getName()
-	{
-		return name;
-	}
-
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-
-	public int getAge()
-	{
-		return age;
-	}
-
-
-	public void setAge(int age)
-	{
-		this.age = age;
-	}
-
-
-	private void foo()
-	{
-		// Nothing to do.
-	}
-
-
-	public void bar()
-	{
-		throw new UnsupportedOperationException();
-	}
 }

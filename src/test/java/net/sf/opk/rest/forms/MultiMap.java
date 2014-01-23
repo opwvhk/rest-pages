@@ -25,10 +25,10 @@ import javax.ws.rs.core.MultivaluedMap;
 
 
 /**
-* A simple, used but untested, implementation of {@code MultivaluedMap}.
-*
-* @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
-*/
+ * A simple, used but untested, implementation of {@code MultivaluedMap}.
+ *
+ * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
+ */
 public class MultiMap<K, V> implements MultivaluedMap<K, V>
 {
 	private Map<K, List<V>> underlyingMap = new HashMap<>();

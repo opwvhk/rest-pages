@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.rest.util;
+package net.sf.opk.util;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;

@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import net.sf.opk.rest.forms.conversion.ConversionService;
-import net.sf.opk.rest.util.Cache;
+import net.sf.opk.util.Cache;
 
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;

@@ -15,14 +15,18 @@
  */
 package net.sf.opk.beans;
 
+import java.util.Iterator;
 import java.util.List;
+import javax.validation.Path;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class ListIndexTest extends NestedPropertyTestBase
@@ -41,6 +45,13 @@ public class ListIndexTest extends NestedPropertyTestBase
 
 		arrayIndex = new ListIndex(createParentBean(long[].class), 1);
 		listIndex = new ListIndex(createParentBean(List.class, String.class), 1);
+	}
+
+
+	@Test(expected = BeanPropertyException.class)
+	public void testWrongBeanProperty()
+	{
+		new ListIndex(createParentBean(String.class), 1).getTypedValue(null);
 	}
 
 
@@ -74,10 +85,28 @@ public class ListIndexTest extends NestedPropertyTestBase
 
 
 	@Test
+	public void testGetNullForNull1()
+	{
+		BeanProperty.TypedValue<Object> typedValue = arrayIndex.getTypedValue(null);
+		assertEquals(long.class, typedValue.getType().getErasedType());
+		assertEquals(null, typedValue.getValue());
+	}
+
+
+	@Test
+	public void testGetNullForNull2()
+	{
+		BeanProperty.TypedValue<Object> typedValue = listIndex.getTypedValue(null);
+		assertEquals(String.class, typedValue.getType().getErasedType());
+		assertEquals(null, typedValue.getValue());
+	}
+
+
+	@Test
 	public void testSetArrayValue()
 	{
 		long newValue = 123;
-		arrayIndex.setValue(array, newValue);
+		assertTrue(arrayIndex.setValue(array, newValue));
 		assertEquals(newValue, array[1]);
 	}
 
@@ -85,7 +114,7 @@ public class ListIndexTest extends NestedPropertyTestBase
 	@Test
 	public void testSetListValue1()
 	{
-		listIndex.setValue(list, null);
+		assertTrue(listIndex.setValue(list, null));
 		assertNull(list.get(1));
 	}
 
@@ -94,8 +123,15 @@ public class ListIndexTest extends NestedPropertyTestBase
 	public void testSetListValue2()
 	{
 		String newValue = "foo";
-		listIndex.setValue(list, newValue);
+		assertTrue(listIndex.setValue(list, newValue));
 		assertEquals(newValue, list.get(1));
+	}
+
+
+	@Test
+	public void testSetListValue3()
+	{
+		assertFalse(listIndex.setValue(null, "foo"));
 	}
 
 
@@ -110,5 +146,31 @@ public class ListIndexTest extends NestedPropertyTestBase
 	public void testWrongValueType2()
 	{
 		listIndex.setValue(list, 42L);
+	}
+
+
+	@Test
+	public void testPath()
+	{
+		Path actual = listIndex.toPath();
+		Iterator<Path.Node> iterator = actual.iterator();
+
+		assertTrue(iterator.hasNext());
+
+		Path.Node node = iterator.next();
+		assertNull(node.getName());
+		assertNull(node.getIndex());
+		assertNull(node.getKey());
+		assertFalse(node.isInIterable());
+
+		assertTrue(iterator.hasNext());
+
+		node = iterator.next();
+		assertNull(node.getName());
+		assertEquals(Integer.valueOf(1), node.getIndex());
+		assertNull(node.getKey());
+		assertTrue(node.isInIterable());
+
+		assertFalse(iterator.hasNext());
 	}
 }

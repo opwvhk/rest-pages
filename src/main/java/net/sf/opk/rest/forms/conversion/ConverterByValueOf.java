@@ -20,9 +20,9 @@ import java.lang.reflect.Modifier;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.rest.util.BeanUtil;
-import net.sf.opk.rest.util.Cache;
 import net.sf.opk.rest.util.Prioritized;
+import net.sf.opk.util.BeanUtil;
+import net.sf.opk.util.Cache;
 
 import static java.lang.String.format;
 
@@ -73,8 +73,8 @@ public class ConverterByValueOf extends SingleValueConverter implements Prioriti
 	@Override
 	public <T> T convertTo(ResolvedType resolvedType, String value)
 	{
-        Class<T> clazz = (Class<T>) resolvedType.getErasedType();
-        Method valueOfMethod = getValueOfMethod(clazz);
+		Class<T> clazz = (Class<T>)resolvedType.getErasedType();
+		Method valueOfMethod = getValueOfMethod(clazz);
 		if (valueOfMethod == null)
 		{
 			throw new ConversionException(format(

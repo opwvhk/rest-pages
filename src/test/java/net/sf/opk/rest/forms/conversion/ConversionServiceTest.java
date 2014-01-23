@@ -25,8 +25,8 @@ import javax.enterprise.util.TypeLiteral;
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
-import static net.sf.opk.rest.util.GenericsUtil.resolveType;
+import static java.util.Collections.singletonList;
+import static net.sf.opk.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -46,9 +46,9 @@ public class ConversionServiceTest
 		Converter converter = mock(Converter.class);
 		when(converter.canConvertTo(resolveType(Integer.class))).thenReturn(false);
 		when(converter.canConvertTo(resolveType(String.class))).thenReturn(true);
-		when(converter.convertTo(resolveType(String.class), asList(TEXT))).thenReturn(TEXT);
+		when(converter.convertTo(resolveType(String.class), singletonList(TEXT))).thenReturn(TEXT);
 		when(converter.canConvertTo(resolveType(Long.class))).thenReturn(true);
-		when(converter.convertTo(resolveType(Long.class), asList(VALUE.toString()))).thenReturn(VALUE);
+		when(converter.convertTo(resolveType(Long.class), singletonList(VALUE.toString()))).thenReturn(VALUE);
 
 		conversionService = new ConversionService(new ConvertersInstance(converter));
 	}
@@ -64,8 +64,8 @@ public class ConversionServiceTest
 	@Test
 	public void testConversionSuccess()
 	{
-		assertEquals(TEXT, conversionService.convert(asList(TEXT), resolveType(String.class)));
-		assertEquals(VALUE, conversionService.convert(asList(VALUE.toString()), resolveType(Long.class)));
+		assertEquals(TEXT, conversionService.convert(singletonList(TEXT), resolveType(String.class)));
+		assertEquals(VALUE, conversionService.convert(singletonList(VALUE.toString()), resolveType(Long.class)));
 	}
 
 
@@ -73,9 +73,9 @@ public class ConversionServiceTest
 	public void testConverterCache()
 	{
 		long time1 = System.nanoTime();
-		String result1 = conversionService.convert(asList(TEXT), resolveType(String.class));
+		String result1 = conversionService.convert(singletonList(TEXT), resolveType(String.class));
 		long time2 = System.nanoTime();
-		String result2 = conversionService.convert(asList(TEXT), resolveType(String.class));
+		String result2 = conversionService.convert(singletonList(TEXT), resolveType(String.class));
 		long time3 = System.nanoTime();
 
 		assertEquals(TEXT, result1);

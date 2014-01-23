@@ -23,9 +23,8 @@
 		<version>4</version>
 	</parent>
 
-	<groupId>net.sf.opk</groupId>
 	<artifactId>rest-pages</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>REST Pages</name>
 	<description><![CDATA[
@@ -36,7 +35,8 @@
 	<inceptionYear>2012</inceptionYear>
 	<scm>
 		<connection>scm:svn:svn://svn.code.sf.net/p/opk/code/rest-pages/tags/rest-pages-1.0</connection>
-		<developerConnection>scm:svn:https://svn.code.sf.net/p/opk/code/rest-pages/tags/rest-pages-1.0</developerConnection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/opk/code/rest-pages/tags/rest-pages-1.0
+		</developerConnection>
 		<url>http://svn.code.sf.net/p/opk/code/rest-pages/tags/rest-pages-1.0</url>
 	</scm>
 	<properties>
@@ -63,7 +63,7 @@
 		<dependency>
 			<groupId>org.jboss.spec</groupId>
 			<artifactId>jboss-javaee-6.0</artifactId>
-			<version>3.0.1.Final</version>
+			<version>3.0.2.Final</version>
 			<type>pom</type>
 			<scope>provided</scope>
 		</dependency>

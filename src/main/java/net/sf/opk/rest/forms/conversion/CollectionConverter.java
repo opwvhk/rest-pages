@@ -27,8 +27,8 @@ import javax.inject.Inject;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.rest.util.GenericsUtil;
 import net.sf.opk.rest.util.Prioritized;
+import net.sf.opk.util.GenericsUtil;
 
 import static java.lang.String.format;
 
