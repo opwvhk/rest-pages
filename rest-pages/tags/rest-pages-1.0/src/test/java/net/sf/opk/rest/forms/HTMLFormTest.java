@@ -18,7 +18,6 @@ package net.sf.opk.rest.forms;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,7 @@ import net.sf.opk.beans.PropertyParser;
 import net.sf.opk.beans.conversion.ConversionService;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -86,73 +86,53 @@ public class HTMLFormTest
 	@Test
 	public void testFieldValues() throws IOException
 	{
-		Iterator<Map.Entry<String, String>> values = htmlForm.values().iterator();
-		Map.Entry<String, String> entry;
+		Iterable<Map.Entry<String, String>> formValues = htmlForm.values();
+		List<String> keys = extractKeys(formValues);
+		List<String> values = extractValues(formValues);
 
-		String field1 = "field1";
-
-		assertTrue(values.hasNext());
-		entry = values.next();
-		assertEquals(field1, entry.getKey());
-		assertEquals("value1", entry.getValue());
-
-		assertTrue(values.hasNext());
-		entry = values.next();
-		assertEquals(field1, entry.getKey());
-		assertEquals("value2", entry.getValue());
-
-		assertTrue(values.hasNext());
-		entry = values.next();
-		assertEquals(field1, entry.getKey());
-		assertEquals("value3", entry.getValue());
-
-		assertTrue(values.hasNext());
-		entry = values.next();
-		assertEquals(field1, entry.getKey());
-		assertEquals("value4", entry.getValue());
-
-		String field2 = "parent.field2";
-
-		assertTrue(values.hasNext());
-		entry = values.next();
-		assertEquals(field2, entry.getKey());
-		assertEquals("true", entry.getValue());
-
-		assertFalse(values.hasNext());
+		assertEquals(asList("field1", "field1", "field1", "field1", "parent.field2"), keys);
+		assertEquals(asList("value1", "value2", "value3", "value4", "true"), values);
 	}
 
 
 	@Test
 	public void testUploadedFiles() throws IOException
 	{
-		Map<String, List<UploadedFile>> formUploads = extractValues(htmlForm.uploads());
-		assertEquals(2, formUploads.size());
-		List<UploadedFile> uploads1 = formUploads.get("smallFile");
-		assertEquals(1, uploads1.size());
-		assertTextFile1(uploads1.get(0));
-		List<UploadedFile> uploads2 = formUploads.get("otherFiles");
-		assertEquals(3, uploads2.size());
-		assertTextFile1(uploads2.get(0));
-		assertTextFile2(uploads2.get(1));
-		assertTextFile2(uploads2.get(2));
+		Iterable<Map.Entry<String, UploadedFile>> formValues = htmlForm.uploads();
+		List<String> keys = extractKeys(formValues);
+		List<UploadedFile> values = extractValues(formValues);
+
+		assertEquals(asList("otherFiles", "otherFiles", "otherFiles", "smallFile"), keys);
+
+		assertEquals(keys.size(), values.size());
+
+		assertTextFile1(values.get(0));
+		assertTextFile2(values.get(1));
+		assertTextFile2(values.get(2));
+
+		assertTextFile1(values.get(3));
 	}
 
 
-	private <V> Map<String, List<V>> extractValues(Iterable<Map.Entry<String, V>> valuesIterable)
+	private <K, V> List<K> extractKeys(Iterable<Map.Entry<K, V>> valuesIterable)
 	{
-		Map<String, List<V>> formUploads = new HashMap<>();
-		for (Map.Entry<String, V> entry : valuesIterable)
+		List<K> keys = new ArrayList<>();
+		for (Map.Entry<K, V> entry : valuesIterable)
 		{
-			String key = entry.getKey();
-			List<V> values = formUploads.get(key);
-			if (values == null)
-			{
-				values = new ArrayList<>();
-				formUploads.put(key, values);
-			}
+			keys.add(entry.getKey());
+		}
+		return keys;
+	}
+
+
+	private <K, V> List<V> extractValues(Iterable<Map.Entry<K, V>> valuesIterable)
+	{
+		List<V> values = new ArrayList<>();
+		for (Map.Entry<K, V> entry : valuesIterable)
+		{
 			values.add(entry.getValue());
 		}
-		return formUploads;
+		return values;
 	}
 
 
@@ -171,6 +151,24 @@ public class HTMLFormTest
 		assertEquals(MediaType.TEXT_PLAIN_TYPE, upload.getMimeType());
 		assertEquals(19, upload.getFileSize());
 		assertArrayEquals("Another small file.".getBytes("US-ASCII"), upload.getContents());
+	}
+
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void testFieldValuesAreReadOnly() throws IOException
+	{
+		Iterator<Map.Entry<String, String>> iterator = htmlForm.values().iterator();
+		iterator.next();
+		iterator.remove();
+	}
+
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void testUploadsAreReadOnly() throws IOException
+	{
+		Iterator<Map.Entry<String, UploadedFile>> iterator = htmlForm.uploads().iterator();
+		iterator.next();
+		iterator.remove();
 	}
 
 
@@ -193,7 +191,7 @@ public class HTMLFormTest
 		when(propertyParser.parse("parent.field2")).thenReturn(property2);
 
 		Object value2 = new Object();
-		when(conversionService.convert(asList("true"), typeBoolean)).thenReturn(value2);
+		when(conversionService.convert(singletonList("true"), typeBoolean)).thenReturn(value2);
 
 		htmlForm.applyValuesTo(bean);
 
@@ -215,7 +213,7 @@ public class HTMLFormTest
 		when(propertyParser.parse("field2")).thenReturn(property2);
 
 		Object value2 = new Object();
-		when(conversionService.convert(asList("true"), typeBoolean)).thenReturn(value2);
+		when(conversionService.convert(singletonList("true"), typeBoolean)).thenReturn(value2);
 
 		htmlForm.applyValuesTo("parent", bean);
 
@@ -235,6 +233,7 @@ public class HTMLFormTest
 
 
 	@Test
+	@SuppressWarnings({"SuppressionAnnotation", "ObjectEqualsNull", "EqualsBetweenInconvertibleTypes"})
 	public void testEqualsAndHashCode() throws IOException
 	{
 		HTMLForm htmlForm2 = new HTMLForm(propertyParser, conversionService);
@@ -260,9 +259,7 @@ public class HTMLFormTest
 		assertTrue(htmlForm3.equals(htmlForm3));
 		assertTrue(htmlForm3.equals(htmlForm4));
 
-		//noinspection ObjectEqualsNull
 		assertFalse(htmlForm.equals(null));
-		//noinspection EqualsBetweenInconvertibleTypes
 		assertFalse(htmlForm.equals(""));
 		assertFalse(htmlForm.equals(htmlForm2));
 		assertFalse(htmlForm.equals(htmlForm3));

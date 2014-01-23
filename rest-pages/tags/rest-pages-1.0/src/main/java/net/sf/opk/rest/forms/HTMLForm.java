@@ -18,17 +18,17 @@ package net.sf.opk.rest.forms;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import javax.validation.ConstraintViolation;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
 import net.sf.opk.beans.conversion.ConversionService;
-
-import javax.validation.ConstraintViolation;
 
 import static java.util.Arrays.asList;
 
@@ -150,40 +150,46 @@ public class HTMLForm
 
 
 	/**
-	 * Iterate over all scalar name-value pairs in the form.
+	 * <p>Expose all scalar name-value pairs in the form as an Iterable. Every time an {@link Iterator} is obtained
+	 * from the result, it uses the then current form values.</p>
+	 *
+	 * <p>The name-value pairs are returned in lexicographic key order, and multiple values for a key in submission
+	 * order.</p>
 	 *
 	 * @return an {@code Iterable} for all form data
 	 */
 	protected Iterable<Map.Entry<String, String>> values()
 	{
-		List<Map.Entry<String, String>> result = new ArrayList<>();
-		for (Map.Entry<String, List<String>> entry : formData.entrySet())
-		{
-			for (String value : entry.getValue())
+		return new Iterable<Map.Entry<String, String>>() {
+			@Override
+			public Iterator<Map.Entry<String, String>> iterator()
 			{
-				result.add(new AbstractMap.SimpleEntry<>(entry.getKey(), value));
+				return new NestedIterator<>(formData.entrySet().iterator());
 			}
-		}
-		return result;
+		};
 	}
 
 
 	/**
 	 * Iterate over all uploaded files (with their field name as key) in the form.
 	 *
+	 * <p>Expose all uploaded files (with their field name as key) in the form as an Iterable. Every time an
+	 * {@link Iterator} is obtained from the result, it uses the then current uploads.</p>
+	 *
+	 * <p>The name-value pairs are returned in lexicographic key order, and multiple values for a key in submission
+	 * order.</p>
+	 *
 	 * @return an {@code Iterable} for all uploaded files
 	 */
 	protected Iterable<Map.Entry<String, UploadedFile>> uploads()
 	{
-		List<Map.Entry<String, UploadedFile>> result = new ArrayList<>();
-		for (Map.Entry<String, List<UploadedFile>> entry : fileUploads.entrySet())
-		{
-			for (UploadedFile value : entry.getValue())
+		return new Iterable<Map.Entry<String, UploadedFile>>() {
+			@Override
+			public Iterator<Map.Entry<String, UploadedFile>> iterator()
 			{
-				result.add(new AbstractMap.SimpleEntry<>(entry.getKey(), value));
+				return new NestedIterator<>(fileUploads.entrySet().iterator());
 			}
-		}
-		return result;
+		};
 	}
 
 
@@ -201,12 +207,12 @@ public class HTMLForm
 	/**
 	 * <p>Apply a subset of the scalar form data to the specified bean. The prefix is used as the property the bean
 	 * represents. All form fields with that prefix will be applied.</p>
-     *
-     * <p>Each form field value is converted, applied and validated. </p>
+	 *
+	 * <p>Each form field value is converted, applied and validated. </p>
 	 *
 	 * @param prefix the field name prefix
 	 * @param bean   the Java Bean to apply the scalar form data to
-     * @return a (hopefully empty) set of constraint violations
+	 * @return a (hopefully empty) set of constraint violations
 	 */
 	public Set<ConstraintViolation<?>> applyValuesTo(String prefix, Object bean)
 	{
@@ -228,8 +234,8 @@ public class HTMLForm
 				property.setValue(bean, value);
 			}
 		}
-        return Collections.emptySet();
-    }
+		return Collections.emptySet();
+	}
 
 
 	@Override
@@ -262,5 +268,66 @@ public class HTMLForm
 		int result = formData.hashCode();
 		result = 31 * result + fileUploads.hashCode();
 		return result;
+	}
+
+
+	private class NestedIterator<T> implements Iterator<Map.Entry<String, T>>
+	{
+		/**
+		 * Assumption: this iterator has a list with at least one value for each key.
+		 * If not, the combo hasNext/next doesn't work correctly.
+		 */
+		private final Iterator<Map.Entry<String, List<T>>> formValues;
+		private String currentKey;
+		private Iterator<T> currentValues;
+
+		protected NestedIterator(Iterator<Map.Entry<String, List<T>>> formValues)
+		{
+			this.formValues = formValues;
+			currentKey = null;
+			currentValues = null;
+		}
+
+
+		@Override
+		public boolean hasNext()
+		{
+			boolean thereIsANextValue = false;
+
+			if (currentValues != null)
+			{
+				thereIsANextValue = currentValues.hasNext();
+			}
+
+			if (!thereIsANextValue)
+			{
+				// The values for the current key are exhausted (the current key and values may already be null).
+				currentKey = null;
+				currentValues = null;
+				thereIsANextValue = formValues.hasNext();
+			}
+
+			return thereIsANextValue;
+		}
+
+
+		@Override
+		public Map.Entry<String, T> next()
+		{
+			if (currentValues == null)
+			{
+				Map.Entry<String, List<T>> entry = formValues.next();
+				currentKey = entry.getKey();
+				currentValues = entry.getValue().iterator();
+			}
+			return new AbstractMap.SimpleEntry<>(currentKey, currentValues.next());
+		}
+
+
+		@Override
+		public void remove()
+		{
+			throw new UnsupportedOperationException("Removing form values is not supported.");
+		}
 	}
 }
