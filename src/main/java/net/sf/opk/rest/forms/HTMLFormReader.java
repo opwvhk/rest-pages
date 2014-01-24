@@ -33,6 +33,8 @@ import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.ContentDisposition;
 import javax.mail.internet.MimeUtility;
+import javax.validation.MessageInterpolator;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -79,6 +81,8 @@ public class HTMLFormReader implements MessageBodyReader<HTMLForm>
 	private MIMEConfig config = new MIMEConfig();
 	private PropertyParser propertyParser;
 	private ConversionService conversionService;
+	private Validator validator;
+	private MessageInterpolator messageInterpolator;
 	private UriInfo uriInfo;
 
 
@@ -97,12 +101,15 @@ public class HTMLFormReader implements MessageBodyReader<HTMLForm>
 	 *
 	 * @param propertyParser    the {@code PropertyParse} to use to parse field names
 	 * @param conversionService the {@code ConversionService} to use to convert field values
+	 * @param validator         the {@code Validator} to use to validate field values and target beans
 	 */
 	@Inject
-	public HTMLFormReader(PropertyParser propertyParser, ConversionService conversionService)
+	public HTMLFormReader(PropertyParser propertyParser, ConversionService conversionService, Validator validator, MessageInterpolator messageInterpolator)
 	{
 		this.propertyParser = propertyParser;
 		this.conversionService = conversionService;
+		this.validator = validator;
+		this.messageInterpolator = messageInterpolator;
 	}
 
 
@@ -133,7 +140,7 @@ public class HTMLFormReader implements MessageBodyReader<HTMLForm>
 	{
 		try
 		{
-			HTMLForm htmlForm = new HTMLForm(propertyParser, conversionService);
+			HTMLForm htmlForm = new HTMLForm(propertyParser, conversionService, validator, messageInterpolator);
 
 			// Determnine the type and character set.
 

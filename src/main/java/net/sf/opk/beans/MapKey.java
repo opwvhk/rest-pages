@@ -30,7 +30,7 @@ import static net.sf.opk.beans.util.GenericsUtil.findTypeParameter;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class MapKey extends BeanProperty
+public class MapKey extends NestedBeanProperty
 {
 	/**
 	 * Error message to throw when unsupported beans are given to {@link #getValue(Object)} and {@link #setValue(Object,
@@ -44,15 +44,11 @@ public class MapKey extends BeanProperty
 	/**
 	 * Conversion service; used for map keys.
 	 */
-	private ConversionService conversionService;
-	/**
-	 * Parent property. This property is a nested property, so the parent property handles all but the last segment.
-	 */
-	private BeanProperty parent;
+	private final ConversionService conversionService;
 	/**
 	 * The key to represent.
 	 */
-	private String key;
+	private final String key;
 
 
 	/**
@@ -64,8 +60,8 @@ public class MapKey extends BeanProperty
 	 */
 	public MapKey(ConversionService conversionService, BeanProperty parent, String key)
 	{
+		super(parent);
 		this.conversionService = conversionService;
-		this.parent = parent;
 		this.key = key;
 	}
 
@@ -73,7 +69,7 @@ public class MapKey extends BeanProperty
 	@Override
 	public <T> TypedValue<T> getTypedValue(Object javaBean)
 	{
-		TypedValue<Map<Object, T>> parentTypedValue = parent.getTypedValue(javaBean);
+		TypedValue<Map<Object, T>> parentTypedValue = getTypedParentValue(javaBean);
 		checkType(parentTypedValue);
 
 		ResolvedType parentType = parentTypedValue.getType();
@@ -123,7 +119,7 @@ public class MapKey extends BeanProperty
 	@Override
 	public boolean setValue(Object javaBean, Object value)
 	{
-		TypedValue<Map<Object, Object>> parentTypedValue = parent.getTypedValue(javaBean);
+		TypedValue<Map<Object, Object>> parentTypedValue = getTypedParentValue(javaBean);
 		checkType(parentTypedValue);
 
 		ResolvedType parentType = parentTypedValue.getType();
@@ -147,6 +143,6 @@ public class MapKey extends BeanProperty
 	@Override
 	protected PathBuilder toPathBuilder()
 	{
-		return parent.toPathBuilder().addMappedNode(key);
+		return parentPathBuilder().addMappedNode(key);
 	}
 }
