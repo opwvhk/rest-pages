@@ -32,7 +32,7 @@ import static net.sf.opk.beans.util.GenericsUtil.resolveType;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class ListIndex extends BeanProperty
+public class ListIndex extends NestedBeanProperty
 {
 	/**
 	 * Error message to throw when unsupported beans are given to {@link #getValue(Object)} and {@link #setValue(Object,
@@ -45,8 +45,6 @@ public class ListIndex extends BeanProperty
 	 */
 	private static final String WRONG_VALUE_TYPE_ERROR = "Cannot set indexed property: %s is not a %s.";
 	private static final Map<ResolvedType, Class<?>> BOXED_TYPES;
-
-
 	static
 	{
 		Map<ResolvedType, Class<?>> boxedTypes = new HashMap<>();
@@ -64,13 +62,9 @@ public class ListIndex extends BeanProperty
 
 
 	/**
-	 * Parent property. This property is a nested property, so the parent property handles all but the last segment.
-	 */
-	private BeanProperty parent;
-	/**
 	 * The index to represent.
 	 */
-	private int index;
+	private final int index;
 
 
 	/**
@@ -81,7 +75,7 @@ public class ListIndex extends BeanProperty
 	 */
 	public ListIndex(BeanProperty parent, int index)
 	{
-		this.parent = parent;
+		super(parent);
 		this.index = index;
 	}
 
@@ -89,7 +83,7 @@ public class ListIndex extends BeanProperty
 	@Override
 	public <T> TypedValue<T> getTypedValue(Object javaBean)
 	{
-		TypedValue<Object> parentTypedValue = parent.getTypedValue(javaBean);
+		TypedValue<Object> parentTypedValue = getTypedParentValue(javaBean);
 		ResolvedType parentType = parentTypedValue.getType();
 
 		ResolvedType resolvedType = determineElementType(parentType);
@@ -144,7 +138,7 @@ public class ListIndex extends BeanProperty
 	@Override
 	public boolean setValue(Object javaBean, Object value)
 	{
-		TypedValue<Object> parentTypedValue = parent.getTypedValue(javaBean);
+		TypedValue<Object> parentTypedValue = getTypedParentValue(javaBean);
         Object parentValue = parentTypedValue.getValue();
         if (parentValue == null) {
             return false;
@@ -173,6 +167,6 @@ public class ListIndex extends BeanProperty
 	@Override
 	protected PathBuilder toPathBuilder()
 	{
-		return parent.toPathBuilder().addIndexedNode(index);
+		return parentPathBuilder().addIndexedNode(index);
 	}
 }

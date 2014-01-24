@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Validator;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.classmate.ResolvedType;
@@ -31,11 +32,11 @@ import org.junit.Test;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
-import net.sf.opk.rest.forms.conversion.ConversionService;
+import net.sf.opk.beans.conversion.ConversionService;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static net.sf.opk.rest.util.GenericsUtil.resolveType;
+import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -50,6 +51,7 @@ public class HTMLFormTest
 {
 	private PropertyParser propertyParser;
 	private ConversionService conversionService;
+	private Validator validator;
 	private HTMLForm htmlForm;
 
 
@@ -58,8 +60,9 @@ public class HTMLFormTest
 	{
 		propertyParser = mock(PropertyParser.class);
 		conversionService = mock(ConversionService.class);
+		validator = mock(Validator.class);
 
-		htmlForm = new HTMLForm(propertyParser, conversionService);
+		htmlForm = new HTMLForm(propertyParser, conversionService, validator);
 		addFieldValues(htmlForm);
 		addUploadedFiles(htmlForm);
 	}
@@ -246,17 +249,17 @@ public class HTMLFormTest
 	@Test
 	public void testEqualsAndHashCode() throws IOException
 	{
-		HTMLForm htmlForm2 = new HTMLForm(propertyParser, conversionService);
+		HTMLForm htmlForm2 = new HTMLForm(propertyParser, conversionService, validator);
 		addFieldValues(htmlForm2);
 		addUploadedFiles(htmlForm2);
 
-		HTMLForm htmlForm3 = new HTMLForm(propertyParser, conversionService);
+		HTMLForm htmlForm3 = new HTMLForm(propertyParser, conversionService, validator);
 		addFieldValues(htmlForm3);
 
-		HTMLForm htmlForm4 = new HTMLForm(propertyParser, conversionService);
+		HTMLForm htmlForm4 = new HTMLForm(propertyParser, conversionService, validator);
 		addFieldValues(htmlForm4);
 
-		HTMLForm htmlForm5 = new HTMLForm(propertyParser, conversionService);
+		HTMLForm htmlForm5 = new HTMLForm(propertyParser, conversionService, validator);
 
 		assertEquals(htmlForm.hashCode(), htmlForm.hashCode());
 		assertFalse(htmlForm.hashCode() == htmlForm2.hashCode());

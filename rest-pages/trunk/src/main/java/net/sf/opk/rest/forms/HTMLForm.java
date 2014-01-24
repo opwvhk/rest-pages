@@ -17,7 +17,9 @@ package net.sf.opk.rest.forms;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +27,13 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.validation.ConstraintViolation;
+import javax.validation.MessageInterpolator;
+import javax.validation.Validator;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
+import net.sf.opk.beans.conversion.SimpleConstraintViolation;
+import net.sf.opk.beans.conversion.ConversionException;
 import net.sf.opk.beans.conversion.ConversionService;
 
 import static java.util.Arrays.asList;
@@ -74,18 +80,30 @@ public class HTMLForm
 	 * The {@code ConversionService} that is used to convert the form data to Java Bean property values.
 	 */
 	private ConversionService conversionService;
+	/**
+	 * The validator to use to validate beans after applying values to them.
+	 */
+	private Validator validator;
+	/**
+	 * The message interpolator to use to translate conversion errors.
+	 */
+	private MessageInterpolator messageInterpolator;
 
 
 	/**
 	 * Create an HTMLForm.
 	 *
 	 * @param propertyParser    the {@code PropertyParser} to use for the {@link #applyValuesTo(String, Object)} method
-	 * @param conversionService the {@code conversionService} to use for the {@link #applyValuesTo(String, Object)} method
+	 * @param conversionService the {@code ConversionService} to use for the {@link #applyValuesTo(String, Object)} method
+	 * @param validator         the {@code Validator} to use for the {@link #applyValuesTo(String, Object)} method
 	 */
-	public HTMLForm(PropertyParser propertyParser, ConversionService conversionService)
+	public HTMLForm(PropertyParser propertyParser, ConversionService conversionService, Validator validator,
+	                MessageInterpolator messageInterpolator)
 	{
 		this.propertyParser = propertyParser;
 		this.conversionService = conversionService;
+		this.validator = validator;
+		this.messageInterpolator = messageInterpolator;
 	}
 
 
@@ -150,8 +168,8 @@ public class HTMLForm
 
 
 	/**
-	 * <p>Expose all scalar name-value pairs in the form as an Iterable. Every time an {@link Iterator} is obtained
-	 * from the result, it uses the then current form values.</p>
+	 * <p>Expose all scalar name-value pairs in the form as an Iterable. Every time an {@link Iterator} is obtained from
+	 * the result, it uses the then current form values.</p>
 	 *
 	 * <p>The name-value pairs are returned in lexicographic key order, and multiple values for a key in submission
 	 * order.</p>
@@ -160,7 +178,8 @@ public class HTMLForm
 	 */
 	protected Iterable<Map.Entry<String, String>> values()
 	{
-		return new Iterable<Map.Entry<String, String>>() {
+		return new Iterable<Map.Entry<String, String>>()
+		{
 			@Override
 			public Iterator<Map.Entry<String, String>> iterator()
 			{
@@ -173,8 +192,8 @@ public class HTMLForm
 	/**
 	 * Iterate over all uploaded files (with their field name as key) in the form.
 	 *
-	 * <p>Expose all uploaded files (with their field name as key) in the form as an Iterable. Every time an
-	 * {@link Iterator} is obtained from the result, it uses the then current uploads.</p>
+	 * <p>Expose all uploaded files (with their field name as key) in the form as an Iterable. Every time an {@link
+	 * Iterator} is obtained from the result, it uses the then current uploads.</p>
 	 *
 	 * <p>The name-value pairs are returned in lexicographic key order, and multiple values for a key in submission
 	 * order.</p>
@@ -183,7 +202,8 @@ public class HTMLForm
 	 */
 	protected Iterable<Map.Entry<String, UploadedFile>> uploads()
 	{
-		return new Iterable<Map.Entry<String, UploadedFile>>() {
+		return new Iterable<Map.Entry<String, UploadedFile>>()
+		{
 			@Override
 			public Iterator<Map.Entry<String, UploadedFile>> iterator()
 			{
@@ -216,25 +236,61 @@ public class HTMLForm
 	 */
 	public Set<ConstraintViolation<?>> applyValuesTo(String prefix, Object bean)
 	{
-		if (prefix != null)
+		String nonNullPrefix = "";
+		String pathPrefix = null;
+		if (prefix != null && prefix.trim().length() > 0)
 		{
-			prefix += '.';
+			nonNullPrefix = prefix.trim() + '.';
+			pathPrefix = prefix.trim();
 		}
-		int prefixLength = prefix == null ? 0 : prefix.length();
 
-		// TODO (OPWvH-K, 2014-01-22): Implement validation, converting ConversionExceptions to ConstraintViolations
-
+		Set<ConstraintViolation<?>> constraintViolations = new HashSet<>();
 		for (Map.Entry<String, List<String>> formParameter : formData.entrySet())
 		{
 			String parameterName = formParameter.getKey();
-			if (prefix == null || parameterName.startsWith(prefix))
+			if (parameterName.startsWith(nonNullPrefix))
 			{
-				BeanProperty property = propertyParser.parse(parameterName.substring(prefixLength));
-				Object value = conversionService.convert(formParameter.getValue(), property.getType(bean));
-				property.setValue(bean, value);
+				String propertyName = parameterName.substring(nonNullPrefix.length());
+				List<String> formValue = formParameter.getValue();
+				setBeanProperty(bean, propertyName, formValue, constraintViolations);
 			}
 		}
-		return Collections.emptySet();
+		return prefixConstraintViolationPaths(constraintViolations, pathPrefix);
+	}
+
+
+	private Set<ConstraintViolation<?>> prefixConstraintViolationPaths(Set<ConstraintViolation<?>> constraintViolations,
+	                                                                   String pathPrefix)
+	{
+		// TODO (OPWvH-K, 2014-01-24): Prefix all paths in the constraint violations with the current prefix.
+		return constraintViolations;
+	}
+
+
+	/**
+	 * Sets a bean property. If successful, the bean is altered. If not, a {@code ConstraintViolation} is added to the
+	 * collection of constraint violations.
+	 *
+	 * @param bean                 the bean whose property to set
+	 * @param propertyName         the property to set
+	 * @param formValue            the value(s) to set the bean property to
+	 * @param constraintViolations the collection to add constraint violations to when they arise
+	 */
+	private void setBeanProperty(Object bean, String propertyName, List<String> formValue,
+	                             Collection<ConstraintViolation<?>> constraintViolations)
+	{
+		BeanProperty property = propertyParser.parse(propertyName);
+		try
+		{
+			Object value = conversionService.convert(formValue, property.getType(bean));
+			property.setValue(bean, value);
+			constraintViolations.addAll(validator.validateProperty(bean, propertyName));
+		}
+		catch (ConversionException e)
+		{
+			constraintViolations.add(new SimpleConstraintViolation<>(bean, property, formValue, e,
+			                                                             messageInterpolator));
+		}
 	}
 
 
@@ -308,12 +364,13 @@ public class HTMLForm
 	private class NestedIterator<T> implements Iterator<Map.Entry<String, T>>
 	{
 		/**
-		 * Assumption: this iterator has a list with at least one value for each key.
-		 * If not, the combo hasNext/next doesn't work correctly.
+		 * Assumption: this iterator has a list with at least one value for each key. If not, the combo hasNext/next doesn't
+		 * work correctly.
 		 */
 		private final Iterator<Map.Entry<String, List<T>>> formValues;
 		private String currentKey;
 		private Iterator<T> currentValues;
+
 
 		protected NestedIterator(Iterator<Map.Entry<String, List<T>>> formValues)
 		{

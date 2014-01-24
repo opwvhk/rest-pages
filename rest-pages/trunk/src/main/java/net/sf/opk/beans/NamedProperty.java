@@ -34,16 +34,12 @@ import static net.sf.opk.beans.util.GenericsUtil.resolveType;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class NamedProperty extends BeanProperty
+public class NamedProperty extends NestedBeanProperty
 {
-	/**
-	 * Parent property. If this property is a nested property, the parent property handles all but the last segment.
-	 */
-	private BeanProperty parent;
 	/**
 	 * The property name.
 	 */
-	private String name;
+	private final String name;
 
 
 	/**
@@ -54,7 +50,7 @@ public class NamedProperty extends BeanProperty
 	 */
 	public NamedProperty(BeanProperty parent, String name)
 	{
-		this.parent = parent;
+		super(parent);
 		this.name = name;
 	}
 
@@ -62,7 +58,7 @@ public class NamedProperty extends BeanProperty
 	@Override
 	public <T> TypedValue<T> getTypedValue(Object javaBean)
 	{
-		TypedValue<Object> parentTypedValue = parent.getTypedValue(javaBean);
+		TypedValue<Object> parentTypedValue = getTypedParentValue(javaBean);
 		ResolvedType parentType = parentTypedValue.getType();
 		Object parentValue = parentTypedValue.getValue();
 
@@ -100,7 +96,7 @@ public class NamedProperty extends BeanProperty
 	@Override
 	public boolean setValue(Object javaBean, Object value)
 	{
-		TypedValue<Object> parentTypedValue = parent.getTypedValue(javaBean);
+		TypedValue<Object> parentTypedValue = getTypedParentValue(javaBean);
 
 		// NOTE: this method should not be called for indexed properties: getTypedValue(...) returns a list facade for these properties.
 
@@ -124,7 +120,7 @@ public class NamedProperty extends BeanProperty
 	@Override
 	protected PathBuilder toPathBuilder()
 	{
-		return parent.toPathBuilder().addNamedNode(name);
+		return parentPathBuilder().addNamedNode(name);
 	}
 
 
