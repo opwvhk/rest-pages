@@ -15,10 +15,16 @@
  */
 package net.sf.opk.beans;
 
+import java.util.Iterator;
+import javax.validation.Path;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class RootPropertyTest
@@ -50,5 +56,23 @@ public class RootPropertyTest
 	public void testSetValue()
 	{
 		rootProperty.setValue(new Object(), null);
+	}
+
+
+	@Test
+	public void testPath()
+	{
+		Path actual = rootProperty.toPath();
+		Iterator<Path.Node> iterator = actual.iterator();
+
+		assertTrue(iterator.hasNext());
+
+		Path.Node node = iterator.next();
+		assertNull(node.getName());
+		assertNull(node.getIndex());
+		assertNull(node.getKey());
+		assertFalse(node.isInIterable());
+
+		assertFalse(iterator.hasNext());
 	}
 }

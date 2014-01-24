@@ -23,10 +23,10 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.opk.rest.forms.conversion.ConversionService;
+import net.sf.opk.beans.conversion.ConversionService;
 
 import static java.util.Collections.singletonList;
-import static net.sf.opk.rest.util.GenericsUtil.resolveType;
+import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;

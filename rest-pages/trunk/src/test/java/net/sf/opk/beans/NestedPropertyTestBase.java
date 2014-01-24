@@ -17,7 +17,7 @@ package net.sf.opk.beans;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import static net.sf.opk.rest.util.GenericsUtil.resolveType;
+import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 
 
 public class NestedPropertyTestBase
@@ -28,7 +28,7 @@ public class NestedPropertyTestBase
 	}
 
 
-	private class DummyBeanProperty implements BeanProperty
+	private class DummyBeanProperty extends BeanProperty
 	{
 		ResolvedType type;
 
@@ -43,15 +43,14 @@ public class NestedPropertyTestBase
 		public <T> TypedValue<T> getTypedValue(Object javaBean)
 		{
 			T value = getValue(javaBean);
-			return new TypedValue<>(getType(javaBean), value);
+			return new TypedValue<>(type, value);
 		}
 
 
 		@Override
 		public ResolvedType getType(Object javaBean)
 		{
-			Class<?> beanClass = javaBean.getClass();
-			return type.getErasedType().isAssignableFrom(beanClass) ? type : resolveType(beanClass);
+			return type;
 		}
 
 
@@ -63,9 +62,16 @@ public class NestedPropertyTestBase
 
 
 		@Override
-		public void setValue(Object javaBean, Object value)
+		public boolean setValue(Object javaBean, Object value)
 		{
 			throw new BeanPropertyException("Error in test.");
+		}
+
+
+		@Override
+		protected PathBuilder toPathBuilder()
+		{
+			return new PathBuilder();
 		}
 	}
 }
