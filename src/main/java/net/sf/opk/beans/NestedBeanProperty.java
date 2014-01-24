@@ -13,69 +13,30 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.beans.util;
+package net.sf.opk.beans;
+
+import com.fasterxml.classmate.ResolvedType;
+
 
 /**
- * Dummy bean to test {@link BeanUtil} with.
+ * A Java Bean property. Instances are only tied to a bean property, not the bean.
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-class DummyBean
+public abstract class NestedBeanProperty implements BeanProperty
 {
-	DummyBean()
+	@Override
+	public ResolvedType getType(Object javaBean)
 	{
-		// Nothing to do.
+		TypedValue<?> typedValue = getTypedValue(javaBean);
+		return typedValue.getType();
 	}
 
 
-	private DummyBean(int age)
+	@Override
+	public <T> T getValue(Object javaBean)
 	{
-		this.age = age;
-	}
-
-
-	DummyBean(String name)
-	{
-		this.name = name.toString();
-	}
-
-
-	private String name;
-	private int age;
-
-
-	public String getName()
-	{
-		return name;
-	}
-
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-
-	public int getAge()
-	{
-		return age;
-	}
-
-
-	public void setAge(int age)
-	{
-		this.age = age;
-	}
-
-
-	private void foo()
-	{
-		// Nothing to do.
-	}
-
-
-	public void bar()
-	{
-		throw new UnsupportedOperationException();
+		TypedValue<T> typedValue = getTypedValue(javaBean);
+		return typedValue.getValue();
 	}
 }

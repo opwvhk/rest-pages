@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.beans.conversion;
+package net.sf.opk.rest.forms.conversion;
 
 import java.util.List;
 
@@ -21,8 +21,8 @@ import com.fasterxml.classmate.ResolvedType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.Collections.singletonList;
-import static net.sf.opk.beans.util.GenericsUtil.resolveType;
+import static java.util.Arrays.asList;
+import static net.sf.opk.rest.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -67,7 +67,7 @@ public class PrimitivesConverterTest
 
 	public void testForPrimitive(ResolvedType primitiveType, ResolvedType wrapperType, String input, Object converted)
 	{
-		List<String> values = singletonList(input);
+		List<String> values = asList(input);
 		when(mockConverter.convertTo(wrapperType, values)).thenReturn(converted);
 
 		assertTrue(converter.canConvertTo(primitiveType));

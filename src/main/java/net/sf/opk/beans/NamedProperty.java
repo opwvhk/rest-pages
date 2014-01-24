@@ -23,10 +23,10 @@ import java.util.List;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.beans.util.BeanUtil;
+import net.sf.opk.rest.util.BeanUtil;
 
-import static net.sf.opk.beans.util.GenericsUtil.resolveReturnType;
-import static net.sf.opk.beans.util.GenericsUtil.resolveType;
+import static net.sf.opk.rest.util.GenericsUtil.resolveReturnType;
+import static net.sf.opk.rest.util.GenericsUtil.resolveType;
 
 
 /**
@@ -34,7 +34,7 @@ import static net.sf.opk.beans.util.GenericsUtil.resolveType;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class NamedProperty extends BeanProperty
+public class NamedProperty extends NestedBeanProperty
 {
 	/**
 	 * Parent property. If this property is a nested property, the parent property handles all but the last segment.
@@ -62,69 +62,48 @@ public class NamedProperty extends BeanProperty
 	@Override
 	public <T> TypedValue<T> getTypedValue(Object javaBean)
 	{
+		// Note 1: returned instances may provide more properties due to subclassing than the signature says.
 		TypedValue<Object> parentTypedValue = parent.getTypedValue(javaBean);
 		ResolvedType parentType = parentTypedValue.getType();
 		Object parentValue = parentTypedValue.getValue();
+		Class<?> parentClass = parentValue.getClass();
 
-		PropertyDescriptor propertyDescriptor = BeanUtil.findProperty(parentType.getErasedType(), name);
+		PropertyDescriptor propertyDescriptor = BeanUtil.findProperty(parentClass, name);
 		Method readMethod = propertyDescriptor.getReadMethod();
 		if (readMethod != null)
 		{
 			ResolvedType resolvedType = resolveReturnType(parentType, readMethod);
-			T propertyValue = null;
-			if (parentValue != null)
-			{
-				propertyValue = BeanUtil.invoke(parentValue, readMethod);
-			}
+			T propertyValue = BeanUtil.invoke(parentValue, readMethod);
 			return new TypedValue<>(resolvedType, propertyValue);
 		}
 		else if (propertyDescriptor instanceof IndexedPropertyDescriptor)
 		{
-			IndexedPropertyDescriptor indexedPropertyDescriptor = (IndexedPropertyDescriptor)propertyDescriptor;
-			readMethod = indexedPropertyDescriptor.getIndexedReadMethod();
+			readMethod = ((IndexedPropertyDescriptor)propertyDescriptor).getIndexedReadMethod();
 			ResolvedType resolvedType = resolveType(List.class, resolveReturnType(parentType, readMethod));
-			T propertyValue = null;
-			if (parentValue != null)
-			{
-				propertyValue = (T)new IndexedPropertyAsList(parentValue, indexedPropertyDescriptor);
-			}
+			T propertyValue = (T)new IndexedPropertyAsList(parentValue, (IndexedPropertyDescriptor)propertyDescriptor);
 			return new TypedValue<>(resolvedType, propertyValue);
 		}
 		else
 		{
-			throw new BeanPropertyException("%s has no readable property named %s", parentType, name);
+			throw new BeanPropertyException("%s has no readable property named %s", parentClass, name);
 		}
 	}
 
 
 	@Override
-	public boolean setValue(Object javaBean, Object value)
+	public void setValue(Object javaBean, Object value)
 	{
 		TypedValue<Object> parentTypedValue = parent.getTypedValue(javaBean);
 
-		// NOTE: this method should not be called for indexed properties: getTypedValue(...) returns a list facade for these properties.
+		// NOTE: for indexed properties, we'll be the parent of the child BeanProperty that sets the value.
 
-		Class<?> beanType = parentTypedValue.getType().getErasedType();
+		Class<?> beanType = parentTypedValue.getValue().getClass();
 		Method writeMethod = BeanUtil.findProperty(beanType, name).getWriteMethod();
-		if (writeMethod == null || writeMethod.getParameterTypes().length > 1)
+		if (writeMethod == null)
 		{
-			throw new BeanPropertyException("%s has no writeable, non-indexed property named %s", beanType, name);
+			throw new BeanPropertyException("%s has no writeable property named %s", beanType, name);
 		}
-
-		Object parentValue = parentTypedValue.getValue();
-		if (parentValue == null)
-		{
-			return false;
-		}
-		BeanUtil.invoke(parentValue, writeMethod, value);
-		return true;
-	}
-
-
-	@Override
-	protected PathBuilder toPathBuilder()
-	{
-		return parent.toPathBuilder().addNamedNode(name);
+		BeanUtil.invoke(parentTypedValue.getValue(), writeMethod, value);
 	}
 
 

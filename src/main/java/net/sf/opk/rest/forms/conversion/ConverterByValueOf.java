@@ -13,16 +13,16 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.beans.conversion;
+package net.sf.opk.rest.forms.conversion;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.beans.util.Prioritized;
-import net.sf.opk.beans.util.BeanUtil;
-import net.sf.opk.beans.util.Cache;
+import net.sf.opk.rest.util.BeanUtil;
+import net.sf.opk.rest.util.Cache;
+import net.sf.opk.rest.util.Prioritized;
 
 import static java.lang.String.format;
 
@@ -73,8 +73,8 @@ public class ConverterByValueOf extends SingleValueConverter implements Prioriti
 	@Override
 	public <T> T convertTo(ResolvedType resolvedType, String value)
 	{
-		Class<T> clazz = (Class<T>)resolvedType.getErasedType();
-		Method valueOfMethod = getValueOfMethod(clazz);
+        Class<T> clazz = (Class<T>) resolvedType.getErasedType();
+        Method valueOfMethod = getValueOfMethod(clazz);
 		if (valueOfMethod == null)
 		{
 			throw new ConversionException(format(

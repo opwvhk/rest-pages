@@ -20,9 +20,9 @@ import java.util.Map;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.beans.conversion.ConversionService;
+import net.sf.opk.rest.forms.conversion.ConversionService;
 
-import static net.sf.opk.beans.util.GenericsUtil.findTypeParameter;
+import static net.sf.opk.rest.util.GenericsUtil.findTypeParameter;
 
 
 /**
@@ -30,7 +30,7 @@ import static net.sf.opk.beans.util.GenericsUtil.findTypeParameter;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class MapKey extends BeanProperty
+public class MapKey extends NestedBeanProperty
 {
 	/**
 	 * Error message to throw when unsupported beans are given to {@link #getValue(Object)} and {@link #setValue(Object,
@@ -74,79 +74,57 @@ public class MapKey extends BeanProperty
 	public <T> TypedValue<T> getTypedValue(Object javaBean)
 	{
 		TypedValue<Map<Object, T>> parentTypedValue = parent.getTypedValue(javaBean);
-		checkType(parentTypedValue);
-
 		ResolvedType parentType = parentTypedValue.getType();
-		Object keyValue = convertKeyValue(parentType);
+
 		ResolvedType resolvedType = determineValueType(parentType);
 
 		Map<Object, T> parentValue = parentTypedValue.getValue();
-		if (parentValue == null)
-		{
-			return new TypedValue<>(resolvedType, null);
-		}
-		else
-		{
-			return new TypedValue<>(resolvedType, parentValue.get(keyValue));
-		}
+		Object keyValue = convertKeyValue(parentTypedValue.getType());
+
+		return new TypedValue<>(resolvedType, parentValue.get(keyValue));
 	}
 
 
-	private void checkType(TypedValue<?> parentTypedValue)
+	/**
+	 * Determine the element type of the parent bean. Throws an exception if the parent bean is not a List or array.
+	 *
+	 * @param parentType the type of the parent bean
+	 * @return the element type
+	 */
+	protected ResolvedType determineValueType(ResolvedType parentType)
 	{
-		ResolvedType parentType = parentTypedValue.getType();
 		if (!parentType.isInstanceOf(Map.class))
 		{
 			throw new BeanPropertyException(WRONG_PROPERTY_TYPE_ERROR, parentType);
 		}
-		Object parentValue = parentTypedValue.getValue();
-		if (parentValue != null && !(parentValue instanceof Map))
-		{
-			throw new BeanPropertyException(WRONG_PROPERTY_TYPE_ERROR, parentValue.getClass());
-		}
+		return findTypeParameter(parentType, Map.class, 1);
 	}
 
 
 	private Object convertKeyValue(ResolvedType parentType)
 	{
+		if (!parentType.isInstanceOf(Map.class))
+		{
+			throw new BeanPropertyException(WRONG_PROPERTY_TYPE_ERROR, parentType);
+		}
 		ResolvedType keyType = findTypeParameter(parentType, Map.class, 0);
 		return conversionService.convert(Collections.singletonList(key), keyType);
 	}
 
 
-	private ResolvedType determineValueType(ResolvedType parentType)
-	{
-		return findTypeParameter(parentType, Map.class, 1);
-	}
-
-
 	@Override
-	public boolean setValue(Object javaBean, Object value)
+	public void setValue(Object javaBean, Object value)
 	{
-		TypedValue<Map<Object, Object>> parentTypedValue = parent.getTypedValue(javaBean);
-		checkType(parentTypedValue);
+		TypedValue<Map> parentTypedValue = parent.getTypedValue(javaBean);
+		Object keyValue = convertKeyValue(parentTypedValue.getType());
 
-		ResolvedType parentType = parentTypedValue.getType();
-		Object keyValue = convertKeyValue(parentType);
-		ResolvedType resolvedType = determineValueType(parentType);
-
-		if (value != null && !resolvedType.getErasedType().isAssignableFrom(value.getClass()))
+		ResolvedType elementType = determineValueType(parentTypedValue.getType());
+		if (value != null && !elementType.getErasedType().isAssignableFrom(value.getClass()))
 		{
-			throw new BeanPropertyException(WRONG_VALUE_TYPE_ERROR, value.getClass(), resolvedType);
+			throw new BeanPropertyException(WRONG_VALUE_TYPE_ERROR, value.getClass(), elementType);
 		}
 
 		Map<Object, Object> parentValue = parentTypedValue.getValue();
-		if (parentValue == null) {
-			return false;
-		}
 		parentValue.put(keyValue, value);
-        return true;
-	}
-
-
-	@Override
-	protected PathBuilder toPathBuilder()
-	{
-		return parent.toPathBuilder().addMappedNode(key);
 	}
 }

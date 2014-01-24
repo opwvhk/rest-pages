@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.beans.conversion;
+package net.sf.opk.rest.forms.conversion;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,8 +25,8 @@ import javax.ws.rs.QueryParam;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.beans.util.PriorityComparator;
-import net.sf.opk.beans.util.Cache;
+import net.sf.opk.rest.util.Cache;
+import net.sf.opk.rest.util.PriorityComparator;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
@@ -45,9 +45,9 @@ public class ConversionService
 	 */
 	private static Cache<ResolvedType, Converter> cache = new Cache<>();
 	/**
-	 * Constructor argument to allow direct CDI access to the available converters in the system. Used to lazily initialize
-	 * {@link #converters}, as initializing that field in the constructor causes infinite recursion when a converter
-	 * recieves the {@code ConversionService} via (constructor?) injection.
+	 * Constructor argument to allow direct CDI access to the available converters in the system. Used to lazily
+	 * initialize {@link #converters}, as initializing that field in the constructor causes infinite recursion
+	 * when a converter recieves the {@code ConversionService} via (constructor?) injection.
 	 */
 	private Instance<Converter> availableConverters;
 	/**
@@ -62,8 +62,7 @@ public class ConversionService
 	 * @param availableConverters all available converters
 	 */
 	@Inject
-	@SuppressWarnings({"CdiInjectionPointsInspection", "SuppressionAnnotation"})
-	// The Instance interface returns all matching beans
+	@SuppressWarnings("CdiInjectionPointsInspection")
 	public ConversionService(Instance<Converter> availableConverters)
 	{
 		this.availableConverters = availableConverters;
