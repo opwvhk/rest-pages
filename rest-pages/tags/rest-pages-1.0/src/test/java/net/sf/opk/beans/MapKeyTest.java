@@ -16,21 +16,17 @@
 package net.sf.opk.beans;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import javax.validation.Path;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.opk.beans.conversion.ConversionService;
+import net.sf.opk.rest.forms.conversion.ConversionService;
 
 import static java.util.Collections.singletonList;
-import static net.sf.opk.beans.util.GenericsUtil.resolveType;
+import static net.sf.opk.rest.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,14 +56,6 @@ public class MapKeyTest extends NestedPropertyTestBase
 
 
 	@Test(expected = BeanPropertyException.class)
-	public void testWrongBeanProperty()
-	{
-		ConversionService conversionService = mock(ConversionService.class);
-		new MapKey(conversionService, createParentBean(String.class), "1").getTypedValue(null);
-	}
-
-
-	@Test(expected = BeanPropertyException.class)
 	public void testWrongBeanType1()
 	{
 		mapKey.getTypedValue("Not a Map");
@@ -93,18 +81,9 @@ public class MapKeyTest extends NestedPropertyTestBase
 
 
 	@Test
-	public void testGetNullForNull()
-	{
-		BeanProperty.TypedValue<Object> typedValue = mapKey.getTypedValue(null);
-		assertEquals(String.class, typedValue.getType().getErasedType());
-		assertEquals(null, typedValue.getValue());
-	}
-
-
-	@Test
 	public void testSetValue1()
 	{
-		assertTrue(mapKey.setValue(map, null));
+		mapKey.setValue(map, null);
 		assertNull(map.get(keyValue));
 	}
 
@@ -113,15 +92,8 @@ public class MapKeyTest extends NestedPropertyTestBase
 	public void testSetValue2()
 	{
 		String newValue = "the answer";
-		assertTrue(mapKey.setValue(map, newValue));
+		mapKey.setValue(map, newValue);
 		assertEquals(newValue, map.get(keyValue));
-	}
-
-
-	@Test
-	public void testSetValue3()
-	{
-		assertFalse(mapKey.setValue(null, "the answer"));
 	}
 
 
@@ -129,31 +101,5 @@ public class MapKeyTest extends NestedPropertyTestBase
 	public void testWrongValueType()
 	{
 		mapKey.setValue(map, 42L);
-	}
-
-
-	@Test
-	public void testPath()
-	{
-		Path actual = mapKey.toPath();
-		Iterator<Path.Node> iterator = actual.iterator();
-
-		assertTrue(iterator.hasNext());
-
-		Path.Node node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertEquals(String.valueOf(keyValue), node.getKey());
-		assertTrue(node.isInIterable());
-
-		assertFalse(iterator.hasNext());
 	}
 }

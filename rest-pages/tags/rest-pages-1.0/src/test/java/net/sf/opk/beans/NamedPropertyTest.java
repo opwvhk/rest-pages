@@ -16,19 +16,14 @@
 package net.sf.opk.beans;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import javax.validation.Path;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static net.sf.opk.beans.util.GenericsUtil.resolveType;
+import static net.sf.opk.rest.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 
 public class NamedPropertyTest extends NestedPropertyTestBase
@@ -50,7 +45,7 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 		bean.setIndexed1(1, 'b');
 		bean.setIndexed2(new Character[]{'a', 'b'});
 
-		BeanProperty parentBean = createParentBean(DummyBean.class);
+		BeanProperty parentBean = createParentBean(Object.class);
 		namedPropertyRW = new NamedProperty(parentBean, "name");
 		namedPropertyR = new NamedProperty(parentBean, "readOnly");
 		namedPropertyW = new NamedProperty(parentBean, "writeOnly");
@@ -126,46 +121,10 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 
 
 	@Test
-	public void testGetNullForNullRW()
-	{
-		BeanProperty.TypedValue<Object> typedValue = namedPropertyRW.getTypedValue(null);
-		assertEquals(String.class, typedValue.getType().getErasedType());
-		assertEquals(null, typedValue.getValue());
-	}
-
-
-	@Test
-	public void testGetNullForNullR()
-	{
-		BeanProperty.TypedValue<Object> typedValue = namedPropertyR.getTypedValue(null);
-		assertEquals(Integer.class, typedValue.getType().getErasedType());
-		assertEquals(null, typedValue.getValue());
-	}
-
-
-	@Test
-	public void testGetNullForNullI1()
-	{
-		BeanProperty.TypedValue<Object> typedValue = namedPropertyI1.getTypedValue(null);
-		assertEquals(List.class, typedValue.getType().getErasedType());
-		assertEquals(null, typedValue.getValue());
-	}
-
-
-	@Test
-	public void testGetNullForNullI2()
-	{
-		BeanProperty.TypedValue<Object> typedValue = namedPropertyI2.getTypedValue(null);
-		assertEquals(Character[].class, typedValue.getType().getErasedType());
-		assertEquals(null, typedValue.getValue());
-	}
-
-
-	@Test
 	public void testSetTypedValueRW()
 	{
 		String newValue = "new name";
-		assertTrue(namedPropertyRW.setValue(bean, newValue));
+		namedPropertyRW.setValue(bean, newValue);
 		assertEquals(newValue, bean.getName());
 	}
 
@@ -183,7 +142,7 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 		Boolean newValue = true;
 		String oldBeanString = bean.toString();
 
-		assertTrue(namedPropertyW.setValue(bean, newValue));
+		namedPropertyW.setValue(bean, newValue);
 		assertEquals(oldBeanString.replace("false", "true"), bean.toString());
 	}
 
@@ -191,14 +150,7 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 	@Test(expected = BeanPropertyException.class)
 	public void testSetTypedValueI1()
 	{
-		assertTrue(namedPropertyI1.setValue(bean, null));
-	}
-
-
-	@Test
-	public void testSetTypedValueOnNull()
-	{
-		assertFalse(namedPropertyRW.setValue(null, null));
+		namedPropertyI1.setValue(bean, null);
 	}
 
 
@@ -225,34 +177,8 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 	public void testSetTypedValueI2()
 	{
 		Character[] newValue = {'c', 'd'};
-		assertTrue(namedPropertyI2.setValue(bean, newValue));
+		namedPropertyI2.setValue(bean, newValue);
 		assertArrayEquals(newValue, bean.getIndexed2());
-	}
-
-
-	@Test
-	public void testPath()
-	{
-		Path actual = namedPropertyRW.toPath();
-		Iterator<Path.Node> iterator = actual.iterator();
-
-		assertTrue(iterator.hasNext());
-
-		Path.Node node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
-		assertEquals("name", node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertFalse(iterator.hasNext());
 	}
 
 

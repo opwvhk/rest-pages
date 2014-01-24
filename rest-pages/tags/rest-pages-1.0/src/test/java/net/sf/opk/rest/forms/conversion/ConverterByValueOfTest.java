@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.beans.conversion;
+package net.sf.opk.rest.forms.conversion;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,8 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static net.sf.opk.beans.util.GenericsUtil.resolveType;
+import static net.sf.opk.rest.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -110,7 +109,7 @@ public class ConverterByValueOfTest
 	{
 		ResolvedType resolvedType = resolveType(Long.class);
 		assertTrue(converter.canConvertTo(resolvedType));
-		assertEquals(123L, converter.convertTo(resolvedType, singletonList("123")));
+		assertEquals(123L, converter.convertTo(resolvedType, asList("123")));
 	}
 
 
@@ -123,7 +122,6 @@ public class ConverterByValueOfTest
 	}
 
 
-	@SuppressWarnings("ALL")
 	public static class InvalidBean1
 	{
 		public String toString()
@@ -144,7 +142,7 @@ public class ConverterByValueOfTest
 		}
 	}
 
-	@SuppressWarnings("ALL")
+
 	public static class InvalidBean2
 	{
 		public static InvalidBean2 valueOf(Long value)
