@@ -23,8 +23,8 @@ import java.util.Map;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import static net.sf.opk.rest.util.GenericsUtil.findTypeParameter;
-import static net.sf.opk.rest.util.GenericsUtil.resolveType;
+import static net.sf.opk.beans.util.GenericsUtil.findTypeParameter;
+import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 
 
 /**
@@ -32,7 +32,7 @@ import static net.sf.opk.rest.util.GenericsUtil.resolveType;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class ListIndex extends NestedBeanProperty
+public class ListIndex extends BeanProperty
 {
 	/**
 	 * Error message to throw when unsupported beans are given to {@link #getValue(Object)} and {@link #setValue(Object,
@@ -45,7 +45,10 @@ public class ListIndex extends NestedBeanProperty
 	 */
 	private static final String WRONG_VALUE_TYPE_ERROR = "Cannot set indexed property: %s is not a %s.";
 	private static final Map<ResolvedType, Class<?>> BOXED_TYPES;
-	static {
+
+
+	static
+	{
 		Map<ResolvedType, Class<?>> boxedTypes = new HashMap<>();
 		boxedTypes.put(resolveType(Byte.TYPE), Byte.class);
 		boxedTypes.put(resolveType(Short.TYPE), Short.class);
@@ -58,6 +61,8 @@ public class ListIndex extends NestedBeanProperty
 		boxedTypes.put(resolveType(Character.TYPE), Character.class);
 		BOXED_TYPES = Collections.unmodifiableMap(boxedTypes);
 	}
+
+
 	/**
 	 * Parent property. This property is a nested property, so the parent property handles all but the last segment.
 	 */
@@ -90,15 +95,25 @@ public class ListIndex extends NestedBeanProperty
 		ResolvedType resolvedType = determineElementType(parentType);
 
 		Object parentValue = parentTypedValue.getValue();
-		if (parentType.isArray())
+		if (parentValue == null)
+		{
+			return new TypedValue<>(resolvedType, null);
+		}
+
+		Class<?> parentValueClass = parentValue.getClass();
+		if (parentValueClass.isArray())
 		{
 			T value = (T)Array.get(parentValue, index);
 			return new TypedValue<>(resolvedType, value);
 		}
-		else
+		else if (parentValue instanceof List)
 		{
 			T value = (T)((List<Object>)parentValue).get(index);
 			return new TypedValue<>(resolvedType, value);
+		}
+		else
+		{
+			throw new BeanPropertyException(WRONG_PROPERTY_TYPE_ERROR, parentValueClass);
 		}
 	}
 
@@ -127,19 +142,22 @@ public class ListIndex extends NestedBeanProperty
 
 
 	@Override
-	public void setValue(Object javaBean, Object value)
+	public boolean setValue(Object javaBean, Object value)
 	{
 		TypedValue<Object> parentTypedValue = parent.getTypedValue(javaBean);
-		ResolvedType parentType = parentTypedValue.getType();
+        Object parentValue = parentTypedValue.getValue();
+        if (parentValue == null) {
+            return false;
+        }
 
-		ResolvedType elementType = determineElementType(parentType);
-		if (value != null && !elementType.getErasedType().isAssignableFrom(value.getClass())
-		    && !(elementType.isPrimitive() && BOXED_TYPES.get(elementType).equals(value.getClass())))
+        ResolvedType parentType = parentTypedValue.getType();
+        ResolvedType elementType = determineElementType(parentType);
+        if (value != null && !elementType.getErasedType().isAssignableFrom(value.getClass()) &&
+		    !(elementType.isPrimitive() && BOXED_TYPES.get(elementType).equals(value.getClass())))
 		{
-			throw new BeanPropertyException(WRONG_VALUE_TYPE_ERROR, value.getClass(), elementType);
-		}
+            throw new BeanPropertyException(WRONG_VALUE_TYPE_ERROR, value.getClass(), elementType);
+        }
 
-		Object parentValue = parentTypedValue.getValue();
 		if (parentType.isArray())
 		{
 			Array.set(parentValue, index, value);
@@ -148,5 +166,13 @@ public class ListIndex extends NestedBeanProperty
 		{
 			((List<Object>)parentValue).set(index, value);
 		}
+        return true;
+	}
+
+
+	@Override
+	protected PathBuilder toPathBuilder()
+	{
+		return parent.toPathBuilder().addIndexedNode(index);
 	}
 }
