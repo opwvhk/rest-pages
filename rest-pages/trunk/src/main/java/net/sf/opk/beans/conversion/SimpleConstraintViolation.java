@@ -6,7 +6,6 @@ import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import net.sf.opk.beans.BeanProperty;
-import net.sf.opk.beans.NestedBeanProperty;
 
 
 /**
@@ -32,14 +31,7 @@ public class SimpleConstraintViolation<T> implements ConstraintViolation<T>
 		// TODO (OPWvH-K, 2014-01-24): Move complexity to HtmlForm
 		this.rootBean = rootBean;
 		rootBeanClass = (Class<T>)rootBean.getClass();
-		if (property instanceof NestedBeanProperty)
-		{
-			leafBean = ((NestedBeanProperty)property).getTypedParentValue(rootBean).getValue();
-		}
-		else
-		{
-			leafBean = rootBean;
-		}
+		leafBean = property.getTypedParentValue(rootBean).getValue(); // Can throw IllegalStateException!
 		messageTemplate = conversionException.getMessage();
 		propertyPath = property.toPath();
 		this.invalidValue = invalidValue;

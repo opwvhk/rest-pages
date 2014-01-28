@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Oscar Westra van Holthe - Kind
+ * Copyright 2012-2013 Oscar Westra van Holthe - Kind
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License.
@@ -41,7 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.opk.beans.PropertyParser;
-import net.sf.opk.rest.forms.conversion.ConversionService;
+import net.sf.opk.beans.conversion.ConversionService;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED_TYPE;
@@ -66,7 +66,7 @@ public class HTMLFormReaderTest
 		PropertyParser propertyParser = mock(PropertyParser.class);
 		ConversionService conversionService = mock(ConversionService.class);
 
-		messageBodyReader = new HTMLFormReader(propertyParser, conversionService);
+		messageBodyReader = new HTMLFormReader(propertyParser, conversionService, null, null);
 
 		UriInfo uriInfo = new UriInfoForQueryParameters();
 		messageBodyReader.setUriInfo(uriInfo);
