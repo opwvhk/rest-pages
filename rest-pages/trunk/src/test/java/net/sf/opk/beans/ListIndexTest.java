@@ -27,6 +27,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class ListIndexTest extends NestedPropertyTestBase
@@ -45,6 +47,13 @@ public class ListIndexTest extends NestedPropertyTestBase
 
 		arrayIndex = new ListIndex(createParentBean(long[].class), 1);
 		listIndex = new ListIndex(createParentBean(List.class, String.class), 1);
+	}
+
+
+	@Test(expected = IllegalStateException.class)
+	public void testNestedProperty()
+	{
+		new ListIndex(null, 1);
 	}
 
 
@@ -150,7 +159,7 @@ public class ListIndexTest extends NestedPropertyTestBase
 
 
 	@Test
-	public void testPath()
+	public void testPath1()
 	{
 		Path actual = listIndex.toPath();
 		Iterator<Path.Node> iterator = actual.iterator();
@@ -159,6 +168,45 @@ public class ListIndexTest extends NestedPropertyTestBase
 
 		Path.Node node = iterator.next();
 		assertNull(node.getName());
+		assertNull(node.getIndex());
+		assertNull(node.getKey());
+		assertFalse(node.isInIterable());
+
+		assertTrue(iterator.hasNext());
+
+		node = iterator.next();
+		assertNull(node.getName());
+		assertEquals(Integer.valueOf(1), node.getIndex());
+		assertNull(node.getKey());
+		assertTrue(node.isInIterable());
+
+		assertFalse(iterator.hasNext());
+	}
+
+
+	@Test
+	public void testPath2()
+	{
+		BeanProperty prefixProperty = mock(BeanProperty.class);
+		PathBuilder prefixPathBuilder = new PathBuilder();
+		prefixPathBuilder.addNamedNode("prefix");
+		when(prefixProperty.toPathBuilder(null)).thenReturn(prefixPathBuilder);
+
+		Path actual = arrayIndex.toPath(prefixProperty);
+		Iterator<Path.Node> iterator = actual.iterator();
+
+		assertTrue(iterator.hasNext());
+
+		Path.Node node = iterator.next();
+		assertNull(node.getName());
+		assertNull(node.getIndex());
+		assertNull(node.getKey());
+		assertFalse(node.isInIterable());
+
+		assertTrue(iterator.hasNext());
+
+		node = iterator.next();
+		assertEquals("prefix", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());
 		assertFalse(node.isInIterable());

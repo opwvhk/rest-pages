@@ -28,13 +28,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.Path;
 import javax.validation.Validator;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
-import net.sf.opk.beans.conversion.SimpleConstraintViolation;
 import net.sf.opk.beans.conversion.ConversionException;
 import net.sf.opk.beans.conversion.ConversionService;
+import net.sf.opk.beans.conversion.SimpleConstraintViolation;
 
 import static java.util.Arrays.asList;
 
@@ -225,23 +226,28 @@ public class HTMLForm
 
 
 	/**
-	 * <p>Apply a subset of the scalar form data to the specified bean. The prefix is used as the property the bean
-	 * represents. All form fields with that prefix will be applied.</p>
+	 * <p>Apply a subset of the scalar form data to the specified bean.</p>
 	 *
-	 * <p>Each form field value is converted, applied and validated. </p>
+	 * <p>If no prefix is specified, all form fields will be applied to the bean as properties.</p>
 	 *
-	 * @param prefix the field name prefix
+	 * <p>If a prefix is specified, it is assumed to be a property whose value is the supplied bean. All form fields
+	 * that represent nested properties of the prefix will be applied to the bean as properties.</p>
+	 *
+	 * <p>In both cases, each form field value is converted and validated before it is applied, and afterwards the
+	 * bean as a whole is also validated after the properties are set.</p>
+	 *
+	 * @param prefix an optional qualified Java identifier, used as field name prefix
 	 * @param bean   the Java Bean to apply the scalar form data to
-	 * @return a (hopefully empty) set of constraint violations
+	 * @return a (hopefully empty) set of constraint violations, using the
 	 */
 	public Set<ConstraintViolation<?>> applyValuesTo(String prefix, Object bean)
 	{
+		Path prefixPath = null;
 		String nonNullPrefix = "";
-		String pathPrefix = null;
-		if (prefix != null && prefix.trim().length() > 0)
+		if (prefix != null)
 		{
-			nonNullPrefix = prefix.trim() + '.';
-			pathPrefix = prefix.trim();
+			prefixPath = propertyParser.parse(prefix).toPath();
+			nonNullPrefix = prefix + '.';
 		}
 
 		Set<ConstraintViolation<?>> constraintViolations = new HashSet<>();
@@ -255,15 +261,33 @@ public class HTMLForm
 				setBeanProperty(bean, propertyName, formValue, constraintViolations);
 			}
 		}
-		return prefixConstraintViolationPaths(constraintViolations, pathPrefix);
+		return prefixConstraintViolationPaths(constraintViolations, prefixPath);
 	}
 
 
 	private Set<ConstraintViolation<?>> prefixConstraintViolationPaths(Set<ConstraintViolation<?>> constraintViolations,
-	                                                                   String pathPrefix)
+	                                                                   Path prefixPath)
 	{
-		// TODO (OPWvH-K, 2014-01-24): Prefix all paths in the constraint violations with the current prefix.
-		return constraintViolations;
+		Set<ConstraintViolation<?>> prefixedConstraintViolations = new HashSet<>();
+		for (ConstraintViolation<?> constraintViolation : constraintViolations)
+		{
+			Object rootBean = constraintViolation.getRootBean();
+			Object invalidValue = constraintViolation.getInvalidValue();
+
+			Path prefixedPath = concatenatePaths(prefixPath, constraintViolation.getPropertyPath());
+
+			prefixedConstraintViolations.add(new SimpleConstraintViolation<Object>(rootBean, null, invalidValue, null,
+			                                                                  null));
+		}
+
+		return prefixedConstraintViolations;
+	}
+
+
+	private Path concatenatePaths(Path prefixPath, Path propertyPath)
+	{
+		//PathBui
+		return propertyPath;
 	}
 
 
@@ -289,7 +313,7 @@ public class HTMLForm
 		catch (ConversionException e)
 		{
 			constraintViolations.add(new SimpleConstraintViolation<>(bean, property, formValue, e,
-			                                                             messageInterpolator));
+			                                                         messageInterpolator));
 		}
 	}
 

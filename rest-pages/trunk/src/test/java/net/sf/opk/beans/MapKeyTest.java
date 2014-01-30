@@ -59,6 +59,13 @@ public class MapKeyTest extends NestedPropertyTestBase
 	}
 
 
+	@Test(expected = IllegalStateException.class)
+	public void testNestedProperty()
+	{
+		new MapKey(null, null, null);
+	}
+
+
 	@Test(expected = BeanPropertyException.class)
 	public void testWrongBeanProperty()
 	{
@@ -133,7 +140,7 @@ public class MapKeyTest extends NestedPropertyTestBase
 
 
 	@Test
-	public void testPath()
+	public void testPath1()
 	{
 		Path actual = mapKey.toPath();
 		Iterator<Path.Node> iterator = actual.iterator();
@@ -142,6 +149,45 @@ public class MapKeyTest extends NestedPropertyTestBase
 
 		Path.Node node = iterator.next();
 		assertNull(node.getName());
+		assertNull(node.getIndex());
+		assertNull(node.getKey());
+		assertFalse(node.isInIterable());
+
+		assertTrue(iterator.hasNext());
+
+		node = iterator.next();
+		assertNull(node.getName());
+		assertNull(node.getIndex());
+		assertEquals(String.valueOf(keyValue), node.getKey());
+		assertTrue(node.isInIterable());
+
+		assertFalse(iterator.hasNext());
+	}
+
+
+	@Test
+	public void testPath2()
+	{
+		BeanProperty prefixProperty = mock(BeanProperty.class);
+		PathBuilder prefixPathBuilder = new PathBuilder();
+		prefixPathBuilder.addNamedNode("prefix");
+		when(prefixProperty.toPathBuilder(null)).thenReturn(prefixPathBuilder);
+
+		Path actual = mapKey.toPath(prefixProperty);
+		Iterator<Path.Node> iterator = actual.iterator();
+
+		assertTrue(iterator.hasNext());
+
+		Path.Node node = iterator.next();
+		assertNull(node.getName());
+		assertNull(node.getIndex());
+		assertNull(node.getKey());
+		assertFalse(node.isInIterable());
+
+		assertTrue(iterator.hasNext());
+
+		node = iterator.next();
+		assertEquals("prefix", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());
 		assertFalse(node.isInIterable());

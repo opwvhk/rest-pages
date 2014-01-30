@@ -49,8 +49,8 @@ public abstract class BeanProperty
 	 */
 	protected BeanProperty(BeanProperty parent)
 	{
-		checkParent();
 		this.parent = parent;
+		checkParent();
 	}
 
 
@@ -66,12 +66,12 @@ public abstract class BeanProperty
 	/**
 	 * Get the fully resolved type of the property from a bean.
 	 *
-	 * @param javaBean the bean to resolve the property type on
+	 * @param rootBean the bean to resolve the property type on
 	 * @return the fully resolved type of the property
 	 */
-	public ResolvedType getType(Object javaBean)
+	public ResolvedType getType(Object rootBean)
 	{
-		TypedValue<?> typedValue = getTypedValue(javaBean);
+		TypedValue<?> typedValue = getTypedValue(rootBean);
 		return typedValue.getType();
 	}
 
@@ -79,12 +79,12 @@ public abstract class BeanProperty
 	/**
 	 * Get the property value from a bean.
 	 *
-	 * @param javaBean the bean to find the property on
+	 * @param rootBean the bean to find the property on
 	 * @return the property value
 	 */
-	public <T> T getValue(Object javaBean)
+	public <T> T getValue(Object rootBean)
 	{
-		TypedValue<T> typedValue = getTypedValue(javaBean);
+		TypedValue<T> typedValue = getTypedValue(rootBean);
 		return typedValue.getValue();
 	}
 
@@ -92,34 +92,34 @@ public abstract class BeanProperty
 	/**
 	 * Set the property value on a bean.
 	 *
-	 * @param javaBean the bean to find the property on
+	 * @param rootBean the bean to find the property on
 	 * @param value    the new property value
      * @return {@code true} if the property has been set, {@code false} if not (for example if the property doesn't exist on this bean instance)
      * @throws BeanPropertyException if the property cannot exist on the bean instance/type
 	 */
-	public abstract boolean setValue(Object javaBean, Object value);
+	public abstract boolean setValue(Object rootBean, Object value);
 
 
 	/**
 	 * Get the value of the property with its fully resolved type, including generics if available.
 	 *
-	 * @param javaBean the bean to find the property on
+	 * @param rootBean the bean to find the property on
 	 * @return the typed value
 	 */
-	public abstract <T> TypedValue<T> getTypedValue(Object javaBean);
+	public abstract <T> TypedValue<T> getTypedValue(Object rootBean);
 
 
 	/**
 	 * Get the types value of the parent of this nested property.
 	 *
-	 * @param javaBean the bean to find the property on
+	 * @param rootBean the bean to find the property on
 	 * @return the typed value of the parent
 	 * @throws IllegalStateException when this property is not a nested property
 	 */
-	public <T> TypedValue<T> getTypedParentValue(Object javaBean)
+	public <T> TypedValue<T> getTypedParentValue(Object rootBean)
 	{
 		checkParent();
-		return parent.getTypedValue(javaBean);
+		return parent.getTypedValue(rootBean);
 	}
 
 
@@ -130,28 +130,42 @@ public abstract class BeanProperty
 	 */
 	public Path toPath()
 	{
-		return toPathBuilder().build();
+		return toPathBuilder(null).build();
 	}
 
 
 	/**
-	 * Get this property as a path builder.
+	 * Get the path to this property, but nest it inside the .
+	 *
+	 * @return the path
+	 */
+	public Path toPath(BeanProperty rootProperty)
+	{
+		return toPathBuilder(rootProperty).build();
+	}
+
+
+	/**
+	 * <p>Get this property as a path builder. If specified, the builder prefixes the path it builds with a root
+	 * property path.</p>
 	 *
 	 * @return the path builder
+	 * @param rootProperty an optional property (used to generate a path prefix) that represents the root bean
 	 */
-	protected abstract PathBuilder toPathBuilder();
+	protected abstract PathBuilder toPathBuilder(BeanProperty rootProperty);
 
 
 	/**
 	 * Get the parent property as a path builder.
 	 *
 	 * @return the path builder for the parent property
+	 * @param rootProperty an optional property (used to generate a path prefix) that represents the root bean
 	 * @throws IllegalStateException when this property is not a nested property
 	 */
-	protected PathBuilder parentPathBuilder()
+	protected PathBuilder parentPathBuilder(BeanProperty rootProperty)
 	{
 		checkParent();
-		return parent.toPathBuilder();
+		return parent.toPathBuilder(rootProperty);
 	}
 
 

@@ -67,9 +67,9 @@ public class MapKey extends BeanProperty
 
 
 	@Override
-	public <T> TypedValue<T> getTypedValue(Object javaBean)
+	public <T> TypedValue<T> getTypedValue(Object rootBean)
 	{
-		TypedValue<Map<Object, T>> parentTypedValue = getTypedParentValue(javaBean);
+		TypedValue<Map<Object, T>> parentTypedValue = getTypedParentValue(rootBean);
 		checkType(parentTypedValue);
 
 		ResolvedType parentType = parentTypedValue.getType();
@@ -117,9 +117,9 @@ public class MapKey extends BeanProperty
 
 
 	@Override
-	public boolean setValue(Object javaBean, Object value)
+	public boolean setValue(Object rootBean, Object value)
 	{
-		TypedValue<Map<Object, Object>> parentTypedValue = getTypedParentValue(javaBean);
+		TypedValue<Map<Object, Object>> parentTypedValue = getTypedParentValue(rootBean);
 		checkType(parentTypedValue);
 
 		ResolvedType parentType = parentTypedValue.getType();
@@ -141,8 +141,8 @@ public class MapKey extends BeanProperty
 
 
 	@Override
-	protected PathBuilder toPathBuilder()
+	protected PathBuilder toPathBuilder(BeanProperty rootProperty)
 	{
-		return parentPathBuilder().addMappedNode(key);
+		return parentPathBuilder(rootProperty).addMappedNode(key);
 	}
 }

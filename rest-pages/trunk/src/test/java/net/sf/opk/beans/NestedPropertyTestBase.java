@@ -28,7 +28,7 @@ public class NestedPropertyTestBase
 	}
 
 
-	private class DummyBeanProperty extends BeanProperty
+	private class DummyBeanProperty extends RootProperty
 	{
 		ResolvedType type;
 
@@ -40,38 +40,9 @@ public class NestedPropertyTestBase
 
 
 		@Override
-		public <T> TypedValue<T> getTypedValue(Object javaBean)
-		{
-			T value = getValue(javaBean);
-			return new TypedValue<>(type, value);
-		}
-
-
-		@Override
-		public ResolvedType getType(Object javaBean)
+		public ResolvedType getType(Object rootBean)
 		{
 			return type;
-		}
-
-
-		@Override
-		public <T> T getValue(Object javaBean)
-		{
-			return (T)javaBean;
-		}
-
-
-		@Override
-		public boolean setValue(Object javaBean, Object value)
-		{
-			throw new BeanPropertyException("Error in test.");
-		}
-
-
-		@Override
-		protected PathBuilder toPathBuilder()
-		{
-			return new PathBuilder();
 		}
 	}
 }
