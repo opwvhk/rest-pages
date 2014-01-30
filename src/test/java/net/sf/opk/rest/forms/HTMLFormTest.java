@@ -62,7 +62,7 @@ public class HTMLFormTest
 		conversionService = mock(ConversionService.class);
 		validator = mock(Validator.class);
 
-		htmlForm = new HTMLForm(propertyParser, conversionService, validator);
+		htmlForm = new HTMLForm(propertyParser, conversionService, validator, null);
 		addFieldValues(htmlForm);
 		addUploadedFiles(htmlForm);
 	}
@@ -249,17 +249,17 @@ public class HTMLFormTest
 	@Test
 	public void testEqualsAndHashCode() throws IOException
 	{
-		HTMLForm htmlForm2 = new HTMLForm(propertyParser, conversionService, validator);
+		HTMLForm htmlForm2 = new HTMLForm(propertyParser, conversionService, validator, null);
 		addFieldValues(htmlForm2);
 		addUploadedFiles(htmlForm2);
 
-		HTMLForm htmlForm3 = new HTMLForm(propertyParser, conversionService, validator);
+		HTMLForm htmlForm3 = new HTMLForm(propertyParser, conversionService, validator, null);
 		addFieldValues(htmlForm3);
 
-		HTMLForm htmlForm4 = new HTMLForm(propertyParser, conversionService, validator);
+		HTMLForm htmlForm4 = new HTMLForm(propertyParser, conversionService, validator, null);
 		addFieldValues(htmlForm4);
 
-		HTMLForm htmlForm5 = new HTMLForm(propertyParser, conversionService, validator);
+		HTMLForm htmlForm5 = new HTMLForm(propertyParser, conversionService, validator, null);
 
 		assertEquals(htmlForm.hashCode(), htmlForm.hashCode());
 		assertFalse(htmlForm.hashCode() == htmlForm2.hashCode());

@@ -56,9 +56,9 @@ public class NamedProperty extends BeanProperty
 
 
 	@Override
-	public <T> TypedValue<T> getTypedValue(Object javaBean)
+	public <T> TypedValue<T> getTypedValue(Object rootBean)
 	{
-		TypedValue<Object> parentTypedValue = getTypedParentValue(javaBean);
+		TypedValue<Object> parentTypedValue = getTypedParentValue(rootBean);
 		ResolvedType parentType = parentTypedValue.getType();
 		Object parentValue = parentTypedValue.getValue();
 
@@ -94,9 +94,9 @@ public class NamedProperty extends BeanProperty
 
 
 	@Override
-	public boolean setValue(Object javaBean, Object value)
+	public boolean setValue(Object rootBean, Object value)
 	{
-		TypedValue<Object> parentTypedValue = getTypedParentValue(javaBean);
+		TypedValue<Object> parentTypedValue = getTypedParentValue(rootBean);
 
 		// NOTE: this method should not be called for indexed properties: getTypedValue(...) returns a list facade for these properties.
 
@@ -118,9 +118,9 @@ public class NamedProperty extends BeanProperty
 
 
 	@Override
-	protected PathBuilder toPathBuilder()
+	protected PathBuilder toPathBuilder(BeanProperty rootProperty)
 	{
-		return parentPathBuilder().addNamedNode(name);
+		return parentPathBuilder(rootProperty).addNamedNode(name);
 	}
 
 

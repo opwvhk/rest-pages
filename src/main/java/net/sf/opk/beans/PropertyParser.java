@@ -33,7 +33,7 @@ import static java.util.regex.Pattern.compile;
  */
 public class PropertyParser
 {
-	private static final String PATTERN_IDENTIFIER = "[\\p{L}_$][\\p{L}\\p{N}_$]*";
+	private static final String PATTERN_IDENTIFIER = "\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*";
 	private static final String PATTERN_NUMBER = "\\d+";
 	private static final String PATTERN_STRING1 = "'(?:\\\\|\\'|[^\\'])*'";
 	private static final String PATTERN_STRING2 = "\"(?:\\\\|\\\"|[^\\\"])*\"";

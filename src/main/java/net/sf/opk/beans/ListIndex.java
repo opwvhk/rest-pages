@@ -81,9 +81,9 @@ public class ListIndex extends BeanProperty
 
 
 	@Override
-	public <T> TypedValue<T> getTypedValue(Object javaBean)
+	public <T> TypedValue<T> getTypedValue(Object rootBean)
 	{
-		TypedValue<Object> parentTypedValue = getTypedParentValue(javaBean);
+		TypedValue<Object> parentTypedValue = getTypedParentValue(rootBean);
 		ResolvedType parentType = parentTypedValue.getType();
 
 		ResolvedType resolvedType = determineElementType(parentType);
@@ -136,9 +136,9 @@ public class ListIndex extends BeanProperty
 
 
 	@Override
-	public boolean setValue(Object javaBean, Object value)
+	public boolean setValue(Object rootBean, Object value)
 	{
-		TypedValue<Object> parentTypedValue = getTypedParentValue(javaBean);
+		TypedValue<Object> parentTypedValue = getTypedParentValue(rootBean);
         Object parentValue = parentTypedValue.getValue();
         if (parentValue == null) {
             return false;
@@ -165,8 +165,8 @@ public class ListIndex extends BeanProperty
 
 
 	@Override
-	protected PathBuilder toPathBuilder()
+	protected PathBuilder toPathBuilder(BeanProperty rootProperty)
 	{
-		return parentPathBuilder().addIndexedNode(index);
+		return parentPathBuilder(rootProperty).addIndexedNode(index);
 	}
 }

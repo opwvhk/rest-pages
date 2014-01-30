@@ -28,30 +28,30 @@ import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 public class RootProperty extends BeanProperty
 {
 	@Override
-	public <T> TypedValue<T> getTypedValue(Object javaBean)
+	public <T> TypedValue<T> getTypedValue(Object rootBean)
 	{
-		ResolvedType type = getType(javaBean);
-		T value = getValue(javaBean);
+		ResolvedType type = getType(rootBean);
+		T value = getValue(rootBean);
 		return new TypedValue<>(type, value);
 	}
 
 
 	@Override
-	public ResolvedType getType(Object javaBean)
+	public ResolvedType getType(Object rootBean)
 	{
-		return resolveType(javaBean.getClass());
+		return resolveType(rootBean.getClass());
 	}
 
 
 	@Override
-	public <T> T getValue(Object javaBean)
+	public <T> T getValue(Object rootBean)
 	{
-		return (T)javaBean;
+		return (T)rootBean;
 	}
 
 
 	@Override
-	public boolean setValue(Object javaBean, Object value)
+	public boolean setValue(Object rootBean, Object value)
 	{
 		throw new BeanPropertyException("Cannot change the root property. Please ensure there are only non-empty " +
 		                                "property paths after the prefix.");
@@ -59,8 +59,8 @@ public class RootProperty extends BeanProperty
 
 
 	@Override
-	protected PathBuilder toPathBuilder()
+	protected PathBuilder toPathBuilder(BeanProperty rootProperty)
 	{
-		return new PathBuilder();
+		return rootProperty == null ? new PathBuilder() : rootProperty.toPathBuilder(null);
 	}
 }
