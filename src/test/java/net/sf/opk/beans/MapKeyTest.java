@@ -150,14 +150,6 @@ public class MapKeyTest extends NestedPropertyTestBase
 		Path.Node node = iterator.next();
 		assertNull(node.getName());
 		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
 		assertEquals(String.valueOf(keyValue), node.getKey());
 		assertTrue(node.isInIterable());
 
@@ -179,14 +171,6 @@ public class MapKeyTest extends NestedPropertyTestBase
 		assertTrue(iterator.hasNext());
 
 		Path.Node node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
 		assertEquals("prefix", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());

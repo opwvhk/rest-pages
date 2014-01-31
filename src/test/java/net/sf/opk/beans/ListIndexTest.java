@@ -168,14 +168,6 @@ public class ListIndexTest extends NestedPropertyTestBase
 
 		Path.Node node = iterator.next();
 		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
-		assertNull(node.getName());
 		assertEquals(Integer.valueOf(1), node.getIndex());
 		assertNull(node.getKey());
 		assertTrue(node.isInIterable());
@@ -198,14 +190,6 @@ public class ListIndexTest extends NestedPropertyTestBase
 		assertTrue(iterator.hasNext());
 
 		Path.Node node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
 		assertEquals("prefix", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());

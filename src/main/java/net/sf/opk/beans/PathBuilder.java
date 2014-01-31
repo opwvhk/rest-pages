@@ -33,15 +33,6 @@ class PathBuilder
 
 
 	/**
-	 * Create a path with a root node.
-	 */
-	public PathBuilder()
-	{
-		path.add(new PathNode());
-	}
-
-
-	/**
 	 * Add a named node.
 	 *
 	 * @param name the name of the node

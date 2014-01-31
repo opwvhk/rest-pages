@@ -189,10 +189,9 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 	@Test
 	public void testSetTypedValueW()
 	{
-		Boolean newValue = true;
 		String oldBeanString = bean.toString();
 
-		assertTrue(namedPropertyW.setValue(bean, newValue));
+		assertTrue(namedPropertyW.setValue(bean, true));
 		assertEquals(oldBeanString.replace("false", "true"), bean.toString());
 	}
 
@@ -248,14 +247,6 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 		assertTrue(iterator.hasNext());
 
 		Path.Node node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
 		assertEquals("name", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());
@@ -279,14 +270,6 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 		assertTrue(iterator.hasNext());
 
 		Path.Node node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
 		assertEquals("prefix", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());
@@ -369,15 +352,13 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 		@Override
 		public String toString()
 		{
-			final StringBuilder sb = new StringBuilder();
-			sb.append("DummyBean");
-			sb.append("{name='").append(name).append('\'');
-			sb.append(", readOnly='").append(readOnly).append('\'');
-			sb.append(", writeOnly='").append(writeOnly).append('\'');
-			sb.append(", indexed1='").append(Arrays.<Character>asList(indexed1)).append('\'');
-			sb.append(", indexed2='").append(Arrays.<Character>asList(indexed2)).append('\'');
-			sb.append('}');
-			return sb.toString();
+			return "DummyBean{" +
+			       "name='" + name + '\'' +
+			       ", readOnly=" + readOnly +
+			       ", writeOnly=" + writeOnly +
+			       ", indexed1=" + Arrays.toString(indexed1) +
+			       ", indexed2=" + Arrays.toString(indexed2) +
+			       '}';
 		}
 	}
 }

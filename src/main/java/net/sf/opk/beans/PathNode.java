@@ -31,15 +31,6 @@ class PathNode implements Path.Node
 
 
 	/**
-	 * Create a root node.
-	 */
-	public PathNode()
-	{
-		this(null, null, null);
-	}
-
-
-	/**
 	 * Create a named node.
 	 *
 	 * @param name the node name
