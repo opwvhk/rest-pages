@@ -67,14 +67,6 @@ public class RootPropertyTest
 		Path actual = rootProperty.toPath();
 		Iterator<Path.Node> iterator = actual.iterator();
 
-		assertTrue(iterator.hasNext());
-
-		Path.Node node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
 		assertFalse(iterator.hasNext());
 	}
 
@@ -93,14 +85,6 @@ public class RootPropertyTest
 		assertTrue(iterator.hasNext());
 
 		Path.Node node = iterator.next();
-		assertNull(node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
 		assertEquals("prefix", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());
