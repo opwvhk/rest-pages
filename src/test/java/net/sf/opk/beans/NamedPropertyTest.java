@@ -29,8 +29,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class NamedPropertyTest extends NestedPropertyTestBase
@@ -259,18 +257,15 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 	@Test
 	public void testPath2()
 	{
-		BeanProperty prefixProperty = mock(BeanProperty.class);
-		PathBuilder prefixPathBuilder = new PathBuilder();
-		prefixPathBuilder.addNamedNode("prefix");
-		when(prefixProperty.toPathBuilder(null)).thenReturn(prefixPathBuilder);
+		Path subProperty = new PathBuilder().addNamedNode("sub").build();
 
-		Path actual = namedPropertyRW.toPath(prefixProperty);
+		Path actual = namedPropertyRW.prefixTo(subProperty);
 		Iterator<Path.Node> iterator = actual.iterator();
 
 		assertTrue(iterator.hasNext());
 
 		Path.Node node = iterator.next();
-		assertEquals("prefix", node.getName());
+		assertEquals("name", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());
 		assertFalse(node.isInIterable());
@@ -278,7 +273,7 @@ public class NamedPropertyTest extends NestedPropertyTestBase
 		assertTrue(iterator.hasNext());
 
 		node = iterator.next();
-		assertEquals("name", node.getName());
+		assertEquals("sub", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());
 		assertFalse(node.isInIterable());

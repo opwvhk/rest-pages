@@ -25,8 +25,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class RootPropertyTest
@@ -74,18 +72,15 @@ public class RootPropertyTest
 	@Test
 	public void testPath2()
 	{
-		BeanProperty prefixProperty = mock(BeanProperty.class);
-		PathBuilder prefixPathBuilder = new PathBuilder();
-		prefixPathBuilder.addNamedNode("prefix");
-		when(prefixProperty.toPathBuilder(null)).thenReturn(prefixPathBuilder);
+		Path subProperty = new PathBuilder().addNamedNode("sub").build();
 
-		Path actual = rootProperty.toPath(prefixProperty);
+		Path actual = rootProperty.prefixTo(subProperty);
 		Iterator<Path.Node> iterator = actual.iterator();
 
 		assertTrue(iterator.hasNext());
 
 		Path.Node node = iterator.next();
-		assertEquals("prefix", node.getName());
+		assertEquals("sub", node.getName());
 		assertNull(node.getIndex());
 		assertNull(node.getKey());
 		assertFalse(node.isInIterable());

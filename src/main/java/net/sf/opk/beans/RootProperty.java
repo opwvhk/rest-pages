@@ -59,8 +59,8 @@ public class RootProperty extends BeanProperty
 
 
 	@Override
-	protected PathBuilder toPathBuilder(BeanProperty rootProperty)
+	protected PathBuilder toPathBuilder()
 	{
-		return rootProperty == null ? new PathBuilder() : rootProperty.toPathBuilder(null);
+		return new PathBuilder();
 	}
 }

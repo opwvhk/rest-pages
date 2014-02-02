@@ -118,9 +118,9 @@ public class NamedProperty extends BeanProperty
 
 
 	@Override
-	protected PathBuilder toPathBuilder(BeanProperty rootProperty)
+	protected PathBuilder toPathBuilder()
 	{
-		return parentPathBuilder(rootProperty).addNamedNode(name);
+		return parentPathBuilder().addNamedNode(name);
 	}
 
 

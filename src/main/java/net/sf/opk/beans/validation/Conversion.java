@@ -1,4 +1,4 @@
-package net.sf.opk.beans.conversion;
+package net.sf.opk.beans.validation;
 
 /**
  * Special validation group denoting conversion.

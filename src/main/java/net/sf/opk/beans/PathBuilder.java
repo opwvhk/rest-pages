@@ -29,7 +29,7 @@ import javax.validation.Path;
  */
 class PathBuilder
 {
-	private final List<Path.Node> path = new ArrayList<>();
+	private final ArrayList<Path.Node> path = new ArrayList<>();
 
 
 	/**
@@ -40,8 +40,7 @@ class PathBuilder
 	 */
 	public PathBuilder addNamedNode(String name)
 	{
-		path.add(new PathNode(name));
-		return this;
+		return addNode(new PathNode(name));
 	}
 
 
@@ -53,8 +52,7 @@ class PathBuilder
 	 */
 	public PathBuilder addIndexedNode(int index)
 	{
-		path.add(new PathNode(index));
-		return this;
+		return addNode(new PathNode(index));
 	}
 
 
@@ -66,11 +64,28 @@ class PathBuilder
 	 */
 	public PathBuilder addMappedNode(Object key)
 	{
-		path.add(new PathNode(key));
+		return addNode(new PathNode(key));
+	}
+
+
+	/**
+	 * Add a node.
+	 *
+	 * @param node the node to add
+	 * @return {@code this}
+	 */
+	public PathBuilder addNode(Path.Node node)
+	{
+		path.add(node);
 		return this;
 	}
 
 
+	/**
+	 * Build the current path.
+	 *
+	 * @return the path
+	 */
 	public Path build()
 	{
 		return new Path()
@@ -78,7 +93,7 @@ class PathBuilder
 			@Override
 			public Iterator<Node> iterator()
 			{
-				return Collections.unmodifiableList(path).iterator();
+				return Collections.unmodifiableList((List<Node>)path.clone()).iterator();
 			}
 		};
 	}

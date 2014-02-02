@@ -130,18 +130,24 @@ public abstract class BeanProperty
 	 */
 	public Path toPath()
 	{
-		return toPathBuilder(null).build();
+		return toPathBuilder().build();
 	}
 
 
 	/**
-	 * Get the path to this property, but nest it inside the .
+	 * Get the path to a sub-property, but prefix the Path to this property to it.
 	 *
 	 * @return the path
 	 */
-	public Path toPath(BeanProperty rootProperty)
+	public Path prefixTo(Path subPropertyPath)
 	{
-		return toPathBuilder(rootProperty).build();
+		PathBuilder pathBuilder = toPathBuilder();
+		for (Path.Node node : subPropertyPath)
+		{
+			pathBuilder.addNode(node);
+		}
+
+		return pathBuilder.build();
 	}
 
 
@@ -150,22 +156,20 @@ public abstract class BeanProperty
 	 * property path.</p>
 	 *
 	 * @return the path builder
-	 * @param rootProperty an optional property (used to generate a path prefix) that represents the root bean
 	 */
-	protected abstract PathBuilder toPathBuilder(BeanProperty rootProperty);
+	protected abstract PathBuilder toPathBuilder();
 
 
 	/**
 	 * Get the parent property as a path builder.
 	 *
 	 * @return the path builder for the parent property
-	 * @param rootProperty an optional property (used to generate a path prefix) that represents the root bean
 	 * @throws IllegalStateException when this property is not a nested property
 	 */
-	protected PathBuilder parentPathBuilder(BeanProperty rootProperty)
+	protected PathBuilder parentPathBuilder()
 	{
 		checkParent();
-		return parent.toPathBuilder(rootProperty);
+		return parent.toPathBuilder();
 	}
 
 
