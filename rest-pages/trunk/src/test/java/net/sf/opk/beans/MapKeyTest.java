@@ -160,29 +160,26 @@ public class MapKeyTest extends NestedPropertyTestBase
 	@Test
 	public void testPath2()
 	{
-		BeanProperty prefixProperty = mock(BeanProperty.class);
-		PathBuilder prefixPathBuilder = new PathBuilder();
-		prefixPathBuilder.addNamedNode("prefix");
-		when(prefixProperty.toPathBuilder(null)).thenReturn(prefixPathBuilder);
+		Path subProperty = new PathBuilder().addNamedNode("sub").build();
 
-		Path actual = mapKey.toPath(prefixProperty);
+		Path actual = mapKey.prefixTo(subProperty);
 		Iterator<Path.Node> iterator = actual.iterator();
 
 		assertTrue(iterator.hasNext());
 
 		Path.Node node = iterator.next();
-		assertEquals("prefix", node.getName());
-		assertNull(node.getIndex());
-		assertNull(node.getKey());
-		assertFalse(node.isInIterable());
-
-		assertTrue(iterator.hasNext());
-
-		node = iterator.next();
 		assertNull(node.getName());
 		assertNull(node.getIndex());
 		assertEquals(String.valueOf(keyValue), node.getKey());
 		assertTrue(node.isInIterable());
+
+		assertTrue(iterator.hasNext());
+
+		node = iterator.next();
+		assertEquals("sub", node.getName());
+		assertNull(node.getIndex());
+		assertNull(node.getKey());
+		assertFalse(node.isInIterable());
 
 		assertFalse(iterator.hasNext());
 	}

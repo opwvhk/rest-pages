@@ -63,7 +63,7 @@ class PathNode implements Path.Node
 	}
 
 
-	PathNode(String name, Integer index, Object key)
+	private PathNode(String name, Integer index, Object key)
 	{
 		this.name = name;
 		this.index = index;

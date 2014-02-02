@@ -28,14 +28,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
-import javax.validation.Path;
 import javax.validation.Validator;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
+import net.sf.opk.beans.RootProperty;
 import net.sf.opk.beans.conversion.ConversionException;
 import net.sf.opk.beans.conversion.ConversionService;
-import net.sf.opk.beans.conversion.SimpleConstraintViolation;
+import net.sf.opk.beans.validation.SimpleConstraintViolation;
 
 import static java.util.Arrays.asList;
 
@@ -242,11 +242,11 @@ public class HTMLForm
 	 */
 	public Set<ConstraintViolation<?>> applyValuesTo(String prefix, Object bean)
 	{
-		Path prefixPath = null;
+		BeanProperty prefixProperty = new RootProperty();
 		String nonNullPrefix = "";
 		if (prefix != null)
 		{
-			prefixPath = propertyParser.parse(prefix).toPath();
+			prefixProperty = propertyParser.parse(prefix);
 			nonNullPrefix = prefix + '.';
 		}
 
@@ -261,33 +261,20 @@ public class HTMLForm
 				setBeanProperty(bean, propertyName, formValue, constraintViolations);
 			}
 		}
-		return prefixConstraintViolationPaths(constraintViolations, prefixPath);
+		return prefixConstraintViolationPaths(constraintViolations, prefixProperty);
 	}
 
 
 	private Set<ConstraintViolation<?>> prefixConstraintViolationPaths(Set<ConstraintViolation<?>> constraintViolations,
-	                                                                   Path prefixPath)
+	                                                                   BeanProperty prefixProperty)
 	{
 		Set<ConstraintViolation<?>> prefixedConstraintViolations = new HashSet<>();
 		for (ConstraintViolation<?> constraintViolation : constraintViolations)
 		{
-			Object rootBean = constraintViolation.getRootBean();
-			Object invalidValue = constraintViolation.getInvalidValue();
-
-			Path prefixedPath = concatenatePaths(prefixPath, constraintViolation.getPropertyPath());
-
-			prefixedConstraintViolations.add(new SimpleConstraintViolation<Object>(rootBean, null, invalidValue, null,
-			                                                                  null));
+			prefixedConstraintViolations.add(new SimpleConstraintViolation<>(constraintViolation, prefixProperty));
 		}
 
 		return prefixedConstraintViolations;
-	}
-
-
-	private Path concatenatePaths(Path prefixPath, Path propertyPath)
-	{
-		//PathBui
-		return propertyPath;
 	}
 
 
@@ -312,8 +299,7 @@ public class HTMLForm
 		}
 		catch (ConversionException e)
 		{
-			constraintViolations.add(new SimpleConstraintViolation<>(bean, property, formValue, e,
-			                                                         messageInterpolator));
+			constraintViolations.add(new SimpleConstraintViolation<>(bean, property, formValue, e.getMessage(), messageInterpolator));
 		}
 	}
 

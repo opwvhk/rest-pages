@@ -165,8 +165,8 @@ public class ListIndex extends BeanProperty
 
 
 	@Override
-	protected PathBuilder toPathBuilder(BeanProperty rootProperty)
+	protected PathBuilder toPathBuilder()
 	{
-		return parentPathBuilder(rootProperty).addIndexedNode(index);
+		return parentPathBuilder().addIndexedNode(index);
 	}
 }

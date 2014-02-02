@@ -141,8 +141,8 @@ public class MapKey extends BeanProperty
 
 
 	@Override
-	protected PathBuilder toPathBuilder(BeanProperty rootProperty)
+	protected PathBuilder toPathBuilder()
 	{
-		return parentPathBuilder(rootProperty).addMappedNode(key);
+		return parentPathBuilder().addMappedNode(key);
 	}
 }
