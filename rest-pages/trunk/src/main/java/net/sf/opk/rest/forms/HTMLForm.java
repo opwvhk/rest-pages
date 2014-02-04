@@ -239,7 +239,7 @@ public class HTMLForm
 	 * @param bean   the Java Bean to apply the scalar form data to
 	 * @return a (hopefully empty) set of constraint violations, using the
 	 */
-	public Set<ConstraintViolation<?>> applyValuesTo(String prefix, Object bean)
+	public <T> Set<ConstraintViolation<T>> applyValuesTo(String prefix, T bean)
 	{
 		BeanProperty prefixProperty = PropertyParser.EMPTY_PROPERTY;
 		String nonNullPrefix = "";
@@ -249,7 +249,7 @@ public class HTMLForm
 			nonNullPrefix = prefix + '.';
 		}
 
-		Set<ConstraintViolation<?>> constraintViolations = new HashSet<>();
+		Set<ConstraintViolation<T>> constraintViolations = new HashSet<>();
 		for (Map.Entry<String, List<String>> formParameter : formData.entrySet())
 		{
 			String parameterName = formParameter.getKey();
@@ -260,15 +260,23 @@ public class HTMLForm
 				setBeanProperty(bean, propertyName, formValue, constraintViolations);
 			}
 		}
-		return prefixConstraintViolationPaths(constraintViolations, prefixProperty);
+		if (constraintViolations.isEmpty())
+		{
+			return validator.validate(bean);
+		}
+		else
+		{
+			return prefixConstraintViolationPaths(constraintViolations, prefixProperty);
+		}
 	}
 
 
-	private Set<ConstraintViolation<?>> prefixConstraintViolationPaths(Set<ConstraintViolation<?>> constraintViolations,
+	private <T> Set<ConstraintViolation<T>> prefixConstraintViolationPaths(Set<ConstraintViolation<T>>
+			                                                                   constraintViolations,
 	                                                                   BeanProperty prefixProperty)
 	{
-		Set<ConstraintViolation<?>> prefixedConstraintViolations = new HashSet<>();
-		for (ConstraintViolation<?> constraintViolation : constraintViolations)
+		Set<ConstraintViolation<T>> prefixedConstraintViolations = new HashSet<>();
+		for (ConstraintViolation<T> constraintViolation : constraintViolations)
 		{
 			prefixedConstraintViolations.add(new SimpleConstraintViolation<>(constraintViolation, prefixProperty));
 		}
@@ -286,8 +294,8 @@ public class HTMLForm
 	 * @param formValue            the value(s) to set the bean property to
 	 * @param constraintViolations the collection to add constraint violations to when they arise
 	 */
-	private void setBeanProperty(Object bean, String propertyName, List<String> formValue,
-	                             Collection<ConstraintViolation<?>> constraintViolations)
+	private <T> void setBeanProperty(T bean, String propertyName, List<String> formValue,
+	                             Collection<ConstraintViolation<T>> constraintViolations)
 	{
 		BeanProperty property = propertyParser.parse(propertyName);
 		try
