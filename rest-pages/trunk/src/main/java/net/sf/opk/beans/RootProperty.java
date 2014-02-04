@@ -25,7 +25,7 @@ import static net.sf.opk.beans.util.GenericsUtil.resolveType;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class RootProperty extends BeanProperty
+class RootProperty extends BeanProperty
 {
 	@Override
 	public <T> TypedValue<T> getTypedValue(Object rootBean)

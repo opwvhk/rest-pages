@@ -34,7 +34,7 @@ import static net.sf.opk.beans.util.GenericsUtil.resolveType;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class NamedProperty extends BeanProperty
+class NamedProperty extends BeanProperty
 {
 	/**
 	 * The property name.

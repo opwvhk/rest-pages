@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.beans.conversion;
+package net.sf.opk.beans;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -24,6 +24,8 @@ import javax.enterprise.util.TypeLiteral;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import net.sf.opk.beans.converters.ConversionException;
 
 import static java.util.Collections.singletonList;
 import static net.sf.opk.beans.util.GenericsUtil.resolveType;

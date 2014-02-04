@@ -23,8 +23,6 @@ import javax.validation.Path;
 import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.opk.beans.conversion.ConversionService;
-
 import static java.util.Collections.singletonList;
 import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertEquals;

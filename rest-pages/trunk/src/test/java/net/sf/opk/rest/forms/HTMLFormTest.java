@@ -32,7 +32,7 @@ import org.junit.Test;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
-import net.sf.opk.beans.conversion.ConversionService;
+import net.sf.opk.beans.ConversionService;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;

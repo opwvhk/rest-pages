@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.beans.conversion;
+package net.sf.opk.beans.converters;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import com.fasterxml.classmate.ResolvedType;
 
+import net.sf.opk.beans.Converter;
 import net.sf.opk.beans.util.Prioritized;
 
 import static net.sf.opk.beans.util.GenericsUtil.resolveType;

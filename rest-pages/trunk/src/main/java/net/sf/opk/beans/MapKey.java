@@ -20,8 +20,6 @@ import java.util.Map;
 
 import com.fasterxml.classmate.ResolvedType;
 
-import net.sf.opk.beans.conversion.ConversionService;
-
 import static net.sf.opk.beans.util.GenericsUtil.findTypeParameter;
 
 
@@ -30,7 +28,7 @@ import static net.sf.opk.beans.util.GenericsUtil.findTypeParameter;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class MapKey extends BeanProperty
+class MapKey extends BeanProperty
 {
 	/**
 	 * Error message to throw when unsupported beans are given to {@link #getValue(Object)} and {@link #setValue(Object,
