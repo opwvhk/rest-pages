@@ -1,4 +1,4 @@
-package net.sf.opk.beans.validation;
+package net.sf.opk.rest.forms.validation;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;

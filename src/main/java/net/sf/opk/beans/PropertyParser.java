@@ -19,7 +19,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 
-import net.sf.opk.beans.conversion.ConversionService;
 import net.sf.opk.beans.util.Cache;
 
 import static java.lang.String.format;
@@ -33,9 +32,25 @@ import static java.util.regex.Pattern.compile;
  */
 public class PropertyParser
 {
+	/**
+	 * An empty/root property. It represents any object/bean as a property.
+	 */
+	public static final BeanProperty EMPTY_PROPERTY = new RootProperty();
+	/**
+	 * Regular expression pattern to match Java identifiers.
+	 */
 	private static final String PATTERN_IDENTIFIER = "\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*";
+	/**
+	 * Regular expression pattern to match numbers.
+	 */
 	private static final String PATTERN_NUMBER = "\\d+";
+	/**
+	 * Regular expression pattern to match strings surrounded by single quotes (').
+	 */
 	private static final String PATTERN_STRING1 = "'(?:\\\\|\\'|[^\\'])*'";
+	/**
+	 * Regular expression pattern to match strings surrounded by double quotes (").
+	 */
 	private static final String PATTERN_STRING2 = "\"(?:\\\\|\\\"|[^\\\"])*\"";
 	/**
 	 * <p>Regular expression that matches all supported properties, one by one. The matched String is a valid property
@@ -107,7 +122,7 @@ public class PropertyParser
 	{
 		checkPatternConstraints(path);
 
-		BeanProperty result = new RootProperty();
+		BeanProperty result = EMPTY_PROPERTY;
 
 		Matcher propertyMatcher = PROPERTY_PATTERN.matcher(path);
 		int tailIndex = 0; // Used to verify we've parsed everything, and if not to show what wasn't parsed.

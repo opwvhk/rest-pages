@@ -13,7 +13,11 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.beans.conversion;
+package net.sf.opk.beans.converters;
+
+import net.sf.opk.beans.ConversionService;
+import net.sf.opk.beans.Converter;
+
 
 /**
  * Exception that occurs in {@link ConversionService} or in {@link Converter} implementations.

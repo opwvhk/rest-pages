@@ -1,4 +1,4 @@
-package net.sf.opk.beans.validation;
+package net.sf.opk.rest.forms.validation;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;

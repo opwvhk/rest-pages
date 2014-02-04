@@ -32,10 +32,9 @@ import javax.validation.Validator;
 
 import net.sf.opk.beans.BeanProperty;
 import net.sf.opk.beans.PropertyParser;
-import net.sf.opk.beans.RootProperty;
-import net.sf.opk.beans.conversion.ConversionException;
-import net.sf.opk.beans.conversion.ConversionService;
-import net.sf.opk.beans.validation.SimpleConstraintViolation;
+import net.sf.opk.beans.converters.ConversionException;
+import net.sf.opk.beans.ConversionService;
+import net.sf.opk.rest.forms.validation.SimpleConstraintViolation;
 
 import static java.util.Arrays.asList;
 
@@ -242,7 +241,7 @@ public class HTMLForm
 	 */
 	public Set<ConstraintViolation<?>> applyValuesTo(String prefix, Object bean)
 	{
-		BeanProperty prefixProperty = new RootProperty();
+		BeanProperty prefixProperty = PropertyParser.EMPTY_PROPERTY;
 		String nonNullPrefix = "";
 		if (prefix != null)
 		{

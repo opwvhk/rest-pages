@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing permissions and limitations under the
  * License.
  */
-package net.sf.opk.beans.conversion;
+package net.sf.opk.beans;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +25,7 @@ import javax.ws.rs.QueryParam;
 
 import com.fasterxml.classmate.ResolvedType;
 
+import net.sf.opk.beans.converters.ConversionException;
 import net.sf.opk.beans.util.PriorityComparator;
 import net.sf.opk.beans.util.Cache;
 

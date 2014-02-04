@@ -32,7 +32,7 @@ import static net.sf.opk.beans.util.GenericsUtil.resolveType;
  *
  * @author <a href="mailto:oscar@westravanholthe.nl">Oscar Westra van Holthe - Kind</a>
  */
-public class ListIndex extends BeanProperty
+class ListIndex extends BeanProperty
 {
 	/**
 	 * Error message to throw when unsupported beans are given to {@link #getValue(Object)} and {@link #setValue(Object,
