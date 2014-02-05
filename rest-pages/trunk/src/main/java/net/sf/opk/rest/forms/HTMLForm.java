@@ -214,13 +214,17 @@ public class HTMLForm
 
 
 	/**
-	 * Apply all scalar form data to the specified bean.
+	 * <p>Apply all scalar form data to the specified bean.</p>
+	 *
+	 * <p>Each form field value is converted and validated before it is applied, and afterwards the bean as a whole is also validated after the properties
+	 * are set.</p>
 	 *
 	 * @param bean the Java Bean to apply all scalar form data to
+	 * @return a (hopefully empty) set of constraint violations, whose paths start at the form root
 	 */
-	public void applyValuesTo(Object bean)
+	public <T> Set<ConstraintViolation<T>> applyValuesTo(T bean)
 	{
-		applyValuesTo(null, bean);
+		return applyValuesTo(null, bean);
 	}
 
 
@@ -237,7 +241,7 @@ public class HTMLForm
 	 *
 	 * @param prefix an optional qualified Java identifier, used as field name prefix
 	 * @param bean   the Java Bean to apply the scalar form data to
-	 * @return a (hopefully empty) set of constraint violations, using the
+	 * @return a (hopefully empty) set of constraint violations, whose paths start at the form root
 	 */
 	public <T> Set<ConstraintViolation<T>> applyValuesTo(String prefix, T bean)
 	{

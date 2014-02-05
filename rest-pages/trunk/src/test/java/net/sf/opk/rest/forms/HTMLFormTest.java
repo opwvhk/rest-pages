@@ -20,49 +20,59 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.MessageInterpolator;
+import javax.validation.Path;
+import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Max;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.classmate.ResolvedType;
 import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.opk.beans.BeanProperty;
-import net.sf.opk.beans.PropertyParser;
 import net.sf.opk.beans.ConversionService;
+import net.sf.opk.beans.PropertyParser;
+import net.sf.opk.beans.converters.ConversionException;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static net.sf.opk.beans.util.GenericsUtil.resolveType;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
 public class HTMLFormTest
 {
-	private PropertyParser propertyParser;
 	private ConversionService conversionService;
-	private Validator validator;
 	private HTMLForm htmlForm;
 
 
 	@Before
 	public void initialize() throws IOException
 	{
-		propertyParser = mock(PropertyParser.class);
 		conversionService = mock(ConversionService.class);
-		validator = mock(Validator.class);
 
-		htmlForm = new HTMLForm(propertyParser, conversionService, validator, null);
+		PropertyParser propertyParser = new PropertyParser(conversionService);
+		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+		MessageInterpolator messageInterpolator = validatorFactory.getMessageInterpolator();
+
+		htmlForm = new HTMLForm(propertyParser, conversionService, validator, messageInterpolator);
 		addFieldValues(htmlForm);
 		addUploadedFiles(htmlForm);
 	}
@@ -134,6 +144,15 @@ public class HTMLFormTest
 	}
 
 
+	@Test(expected = UnsupportedOperationException.class)
+	public void testFieldValuesRemovalFailure() throws IOException
+	{
+		Iterator<Map.Entry<String,String>> values = htmlForm.values().iterator();
+		values.next();
+		values.remove();
+	}
+
+
 	@Test
 	public void testUploadedFiles() throws IOException
 	{
@@ -187,51 +206,81 @@ public class HTMLFormTest
 
 
 	@Test
-	public void testApplyValuesToWithoutPrefix()
+	public void testSuccessfulApplyValuesToWithoutPrefix()
 	{
-		Object bean = new Object();
-
-		ResolvedType typeString = resolveType(String.class);
-		BeanProperty property1 = mock(BeanProperty.class);
-		when(property1.getType(bean)).thenReturn(typeString);
-		when(propertyParser.parse("field1")).thenReturn(property1);
+		SimpleBean bean = new SimpleBean();
+		bean.setParent(new SimpleParentBean());
 
 		Object value1 = new Object();
-		when(conversionService.convert(asList("value1", "value2", "value3", "value4"), typeString)).thenReturn(value1);
+		when(conversionService.convert(eq(asList("value1", "value2", "value3", "value4")), any(ResolvedType.class))).thenReturn(value1);
 
-		ResolvedType typeBoolean = resolveType(Boolean.class);
-		BeanProperty property2 = mock(BeanProperty.class);
-		when(property2.getType(bean)).thenReturn(typeBoolean);
-		when(propertyParser.parse("parent.field2")).thenReturn(property2);
+		when(conversionService.convert(eq(singletonList("true")), any(ResolvedType.class))).thenReturn(true);
 
-		Object value2 = new Object();
-		when(conversionService.convert(singletonList("true"), typeBoolean)).thenReturn(value2);
+		assertTrue(htmlForm.applyValuesTo(bean).isEmpty());
 
-		htmlForm.applyValuesTo(bean);
-
-		verify(propertyParser).parse("parent.field2");
-		verify(propertyParser).parse("field1");
-		verify(property1).setValue(bean, value1);
-		verify(property2).setValue(bean, value2);
+		assertSame(value1, bean.getField1());
+		assertTrue(bean.getParent().isField2());
 	}
 
 
 	@Test
-	public void testApplyValuesToWithPrefix()
+	public void testSuccessfulApplyValuesToWithPrefix()
 	{
-		Object bean = new Object();
+		SimpleParentBean bean = new SimpleParentBean();
 
-		ResolvedType typeBoolean = resolveType(Boolean.class);
-		BeanProperty property2 = mock(BeanProperty.class);
-		when(property2.getType(bean)).thenReturn(typeBoolean);
-		when(propertyParser.parse("field2")).thenReturn(property2);
+		when(conversionService.convert(eq(singletonList("true")), any(ResolvedType.class))).thenReturn(true);
 
-		Object value2 = new Object();
-		when(conversionService.convert(singletonList("true"), typeBoolean)).thenReturn(value2);
+		when(conversionService.convert(eq(singletonList("2")), any(ResolvedType.class))).thenReturn(2);
 
-		htmlForm.applyValuesTo("parent", bean);
+		htmlForm.add("parent.field3", "2");
+		assertTrue(htmlForm.applyValuesTo("parent", bean).isEmpty());
 
-		verify(property2).setValue(bean, value2);
+		assertTrue(bean.isField2());
+		assertEquals(2, bean.getField3());
+	}
+
+
+	@Test
+	public void testFailingApplyValuesToWithPrefix()
+	{
+		String message = "an error";
+
+		SimpleParentBean bean = new SimpleParentBean();
+
+		when(conversionService.convert(eq(singletonList("true")), any(ResolvedType.class))).thenThrow(new ConversionException(message));
+
+		when(conversionService.convert(eq(singletonList("5")), any(ResolvedType.class))).thenReturn(5);
+
+		htmlForm.add("parent.field3", "5");
+		Set<ConstraintViolation<SimpleParentBean>> violations = htmlForm.applyValuesTo("parent", bean);
+
+		assertFalse(bean.isField2()); // Default value: field is not set.
+
+		assertEquals(5, bean.getField3());
+
+		assertEquals(2, violations.size());
+		Set<String> messages = new HashSet<>(2);
+		Set<String> paths = new HashSet<>(2);
+		for (ConstraintViolation<SimpleParentBean> violation : violations)
+		{
+			messages.add(violation.getMessage());
+			paths.add(path(violation.getPropertyPath()));
+		}
+		assertEquals(new HashSet<>(asList(message, "must be less than or equal to 3")), messages);
+		assertEquals(new HashSet<>(asList("parent.field2", "parent.field3")), paths);
+	}
+
+
+	private String path(Path propertyPath)
+	{
+		StringBuilder buffer = new StringBuilder();
+
+		for (Path.Node node : propertyPath)
+		{
+			buffer.append('.').append(node.getName());
+		}
+
+		return buffer.substring(1);
 	}
 
 
@@ -249,17 +298,17 @@ public class HTMLFormTest
 	@Test
 	public void testEqualsAndHashCode() throws IOException
 	{
-		HTMLForm htmlForm2 = new HTMLForm(propertyParser, conversionService, validator, null);
+		HTMLForm htmlForm2 = new HTMLForm(null, null, null, null);
 		addFieldValues(htmlForm2);
 		addUploadedFiles(htmlForm2);
 
-		HTMLForm htmlForm3 = new HTMLForm(propertyParser, conversionService, validator, null);
+		HTMLForm htmlForm3 = new HTMLForm(null, null, null, null);
 		addFieldValues(htmlForm3);
 
-		HTMLForm htmlForm4 = new HTMLForm(propertyParser, conversionService, validator, null);
+		HTMLForm htmlForm4 = new HTMLForm(null, null, null, null);
 		addFieldValues(htmlForm4);
 
-		HTMLForm htmlForm5 = new HTMLForm(propertyParser, conversionService, validator, null);
+		HTMLForm htmlForm5 = new HTMLForm(null, null, null, null);
 
 		assertEquals(htmlForm.hashCode(), htmlForm.hashCode());
 		assertFalse(htmlForm.hashCode() == htmlForm2.hashCode());
@@ -279,5 +328,67 @@ public class HTMLFormTest
 		assertFalse(htmlForm.equals(htmlForm2));
 		assertFalse(htmlForm.equals(htmlForm3));
 		assertFalse(htmlForm3.equals(htmlForm5));
+	}
+
+
+	public static class SimpleBean
+	{
+		private SimpleParentBean parent;
+		private Object field1;
+
+
+		public SimpleParentBean getParent()
+		{
+			return parent;
+		}
+
+
+		public void setParent(SimpleParentBean parent)
+		{
+			this.parent = parent;
+		}
+
+
+		public Object getField1()
+		{
+			return field1;
+		}
+
+
+		public void setField1(Object field1)
+		{
+			this.field1 = field1;
+		}
+	}
+
+	public static class SimpleParentBean
+	{
+		private boolean field2;
+		@Max(3)
+		private int field3;
+
+
+		public boolean isField2()
+		{
+			return field2;
+		}
+
+
+		public void setField2(boolean field2)
+		{
+			this.field2 = field2;
+		}
+
+
+		public int getField3()
+		{
+			return field3;
+		}
+
+
+		public void setField3(int field3)
+		{
+			this.field3 = field3;
+		}
 	}
 }
