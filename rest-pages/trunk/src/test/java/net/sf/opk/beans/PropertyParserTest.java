@@ -224,6 +224,40 @@ public class PropertyParserTest
 	}
 
 
+	@Test
+	public void testFormatProperty() throws Exception
+	{
+		String[] propertyPaths = {
+				"parent.name",
+				"parent.aliases[0]",
+				"parent.indexed1[0]",
+				"parent.indexed2[0]",
+				"parent.variables['KEY1']"
+		};
+
+		for (String propertyPath : propertyPaths)
+		{
+			testFormatProperty(propertyPath, propertyPath);
+		}
+
+		testFormatProperty("parent.variables[KEY1]", "parent.variables['KEY1']");
+		testFormatProperty("parent.variables[\"KEY1\"]", "parent.variables['KEY1']");
+	}
+
+
+	private void testFormatProperty(String input, String expected)
+	{
+		BeanProperty property = propertyParser.parse(input);
+
+		String format1 = propertyParser.format(property);
+		String format2 = propertyParser.format(property.toPath());
+
+		assertEquals(format1, format2);
+
+		assertEquals(expected, format1);
+	}
+
+
 	public static class DummyBean extends DummyBeanSuper
 	{
 		private DummyBean parent;

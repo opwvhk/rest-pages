@@ -18,10 +18,10 @@ package net.sf.opk.beans;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
+import javax.validation.Path;
 
 import net.sf.opk.beans.util.Cache;
 
-import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
 
 
@@ -81,7 +81,7 @@ public class PropertyParser
 	 *                                               # matches above). If not, all input must have been matched.
 	 * </pre>
 	 */
-	private static final Pattern PROPERTY_PATTERN = compile(format(
+	private static final Pattern PROPERTY_PATTERN = compile(String.format(
 			"\\G(?:(?:\\A|(?<=.)\\.)(%s)|\\[(?:(%s)|(%s|%s|%s))\\])(?=\\.|\\[|\\z)", PATTERN_IDENTIFIER, PATTERN_NUMBER,
 			PATTERN_IDENTIFIER, PATTERN_STRING1, PATTERN_STRING2));
 	/**
@@ -106,6 +106,13 @@ public class PropertyParser
 	}
 
 
+	/**
+	 * Parse a property path.
+	 *
+	 * @param path the property path to parse
+	 * @return the parsed property
+	 * @throws BeanPropertyException when the property path is invalid
+	 */
 	public BeanProperty parse(String path)
 	{
 		BeanProperty result = cache.get(path);
@@ -172,8 +179,8 @@ public class PropertyParser
 	{
 		if (tailIndex < path.length())
 		{
-			throw new BeanPropertyException(format("Not a property path; failed to parse: \"%s\"", path.substring(
-					tailIndex)));
+			throw new BeanPropertyException(String.format("Not a property path; failed to parse: \"%s\"",
+			                                              path.substring(tailIndex)));
 		}
 	}
 
@@ -198,5 +205,50 @@ public class PropertyParser
 		stringLiteral = stringLiteral.replace("\\" + escapedQuote, String.valueOf(escapedQuote));
 		stringLiteral = stringLiteral.replace("\\\\", "\\");
 		return stringLiteral;
+	}
+
+
+	/**
+	 * Format a bean property so that it can be parsed by this parser.
+	 * Shorthand for <code>format(property.toPath())</code>.
+	 *
+	 * @param property the property to format as a property path
+	 * @return the parsable property path
+	 */
+	public String format(BeanProperty property)
+	{
+		return format(property.toPath());
+	}
+
+
+	/**
+	 * Format a path so that it can be parsed by this parser.
+	 *
+	 * @param path the property path to format
+	 * @return the parsable property path
+	 */
+	public String format(Path path)
+	{
+		StringBuilder buffer = new StringBuilder();
+
+		for (Path.Node node : path)
+		{
+			if (node.getName() != null)
+			{
+				buffer.append('.').append(node.getName());
+			}
+
+			if (node.getIndex() != null)
+			{
+				buffer.append('[').append(node.getIndex()).append(']');
+			}
+			else if (node.getKey() != null)
+			{
+				String escaped = String.valueOf(node.getKey()).replace("\\", "\\\\").replace("'", "\\'");
+				buffer.append("['").append(escaped).append("']");
+			}
+		}
+
+		return buffer.substring(1);
 	}
 }
